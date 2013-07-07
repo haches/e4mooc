@@ -34,7 +34,7 @@ public class ContextListener implements ServletContextListener{
 
 	private final static Logger LOGGER = Logger.getLogger(ch.ethz.e4mooc.server.ContextListener.class.getName());
 	
-	private final String e4moocTmpFolderPath = ServerProperties.E4MOOC_TMP_FOLDER.toString();
+	private final String e4moocTmpFolderPath = ServerProperties.E4MOOC_TMP_FOLDER;
 	
 	/** thread to watch changes in the E4MOOC project directory */
 	private Thread watchE4MoocThread;
