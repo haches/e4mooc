@@ -105,7 +105,7 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
 		ServerState.getState().setTmpFolderAndTimeStamp(pathOfTmpFolderAndProject);
 	
 		CompilationResultDTO result;
-		if(resultMsg.endsWith("completed\n"))
+		if(resultMsg.endsWith("completed" + System.lineSeparator()))
 			result = new CompilationResultDTO(resultMsg, timeStamp, true);
 		else
 			result = new CompilationResultDTO(resultMsg, timeStamp, false);
@@ -138,9 +138,19 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
 		String pathOfTmpFolder = e4moocTmp + SEP + sessionId + "_" + timeStamp;
 		// the path to the temporary folder + the folder with the project name
 		String pathOfTmpFolderAndProject = pathOfTmpFolder + SEP + projectName;
-		
+		// get the name of the ecf file
 		String ecfFileName = ServerState.getState().getEcfFileNameWithoutAnyPath(projectName);
-		cmdInstruction = getCommandLine(pathOfTmpFolderAndProject + SEP + "EIFGENs" + SEP + ecfFileName + SEP + "W_code" + SEP + ecfFileName);
+		
+		if(ServerProperties.isWindows) {
+			// we execute the program within a sandbox
+			cmdInstruction = getCommandLine(ServerProperties.SANDBOXIE);
+			cmdInstruction.addArgument(pathOfTmpFolderAndProject + SEP + "EIFGENs" + SEP + ecfFileName + SEP + "W_code" + SEP + ecfFileName + ".exe"); 
+		}
+		else {
+			LOGGER.log(Level.WARNING, "NO SANDBOX: user program is execute with being sandboxed");
+			cmdInstruction = getCommandLine(pathOfTmpFolderAndProject + SEP + "EIFGENs" + SEP + ecfFileName + SEP + "W_code" + SEP + ecfFileName);
+		}
+		
 		result = execute(cmdInstruction, 1000 * 180); // timeout after 3 minutes
 		
 		// the user called this compile method thus we can set/update the time stamp for this project
@@ -252,22 +262,7 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
 		executor.setStreamHandler(psh);
 		try {
 
-			Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
-			System.out.println("Number of threads running: " + threadSet.size());
-			for(Thread t: threadSet) {
-				System.out.println("Thread with name: " + t.getName() + "; Id: " + t.getId()); 
-			}
-			System.out.println("==================");
-			
 			executor.execute(cmdInstruction, EnvironmentUtils.getProcEnvironment(), resultHandler);
-			
-			threadSet = Thread.getAllStackTraces().keySet();
-			System.out.println("Number of threads running: " + threadSet.size());
-			for(Thread t: threadSet) {
-				System.out.println("Thread with name: " + t.getName() + "; Id: " + t.getId()); 
-			}
-			
-			
 			resultHandler.waitFor();
 			
 		} catch (ExecuteException e) {
