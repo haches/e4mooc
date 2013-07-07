@@ -24,6 +24,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import ch.ethz.e4mooc.client.ExecutionService;
+import ch.ethz.e4mooc.server.util.ProjectModel;
 import ch.ethz.e4mooc.server.util.ServerProperties;
 import ch.ethz.e4mooc.server.util.ServerState;
 import ch.ethz.e4mooc.shared.CompilationResultDTO;
@@ -190,10 +191,12 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
 				throw e;
 			}
 			
+			// we need to the relative path of each file we got from the user; this info is part of the ProjectModel
+			ProjectModel pm = ServerState.getState().getProjectModel(projectName);
 			// for each file send by the user we have to overwrite the original one in the project
 			for(String fileName: inputFiles.keySet()) {
 				// generate a file and store it in the project's tmp folder
-				writeInputTextToFile(inputFiles.get(fileName), targetFolder.getAbsolutePath() + SEP + fileName);
+				writeInputTextToFile(inputFiles.get(fileName), targetFolder.getAbsolutePath() + SEP + pm.getRelativePathAndFileName(fileName));
 			}
 		}
 	}
