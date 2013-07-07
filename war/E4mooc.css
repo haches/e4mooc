@@ -1,0 +1,23 @@
+/** Add css rules here for your application. */
+
+html, body {
+	height: 100%;
+	width: 100%;
+}
+
+body {
+  padding: 0px !important; /** Overwrite the Bootstrap padding rules */
+}
+
+td {
+	padding: 6px 5px;
+}
+
+.even {
+	background: rgb(255, 255, 255); /* Fall-back for browsers that don't support rgba */
+	background: rgba(255, 255, 255, .5);
+}
+
+.share-Button {
+
+}

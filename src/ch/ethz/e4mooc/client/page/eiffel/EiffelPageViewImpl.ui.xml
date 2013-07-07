@@ -1,0 +1,47 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:m="urn:import:ch.ethz.e4mooc.client.widgets"
+	xmlns:b="urn:import:com.github.gwtbootstrap.client.ui"
+	xmlns:hce2="urn:import:ch.ethz.e4mooc.client.widgets.cmdline"
+	xmlns:hce3="urn:import:ch.ethz.e4mooc.client.widgets.editor">
+
+	<ui:style>
+		/* Add CSS here. See the GWT docs on UI Binder for more details */
+				
+		.output {
+			background-color: #eeeeee;
+			border: 1px solid silver;
+			border-radius: 5px;
+			max-width: 1024px;
+			height: 250px;
+			width: 99%;
+			cursor: text !important;
+			padding: .5%;
+			resize: none;
+			overflow: auto;
+			font-family: monospace;
+			font-size: 12px;
+		}
+		
+		.outer {
+			padding: 10px;
+		}
+		
+		.inner {
+		    max-width: 1024px;
+		    margin: 0 auto;		    
+		}
+		
+	</ui:style>
+	
+	<g:HTMLPanel ui:field="mainPanel" styleName="{style.outer}">
+		<div class="{style.inner}">
+			<hce3:EditorViewImpl ui:field="editorView"/>
+			<hce2:CmdLineViewImpl ui:field="cmdLineView"/>
+			<div ui:field = "outputDiv" class="{style.output}">
+				<p>This will display the output!</p>
+			</div>
+		</div>
+	</g:HTMLPanel>
+</ui:UiBinder> 

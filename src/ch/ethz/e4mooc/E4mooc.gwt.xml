@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 2.5.1//EN"
+  "http://google-web-toolkit.googlecode.com/svn/tags/2.5.1/distro-source/core/src/gwt-module.dtd">
+<module rename-to='e4mooc'>
+  <!-- Inherit the core Web Toolkit stuff.                        -->
+  <inherits name='com.google.gwt.user.User'/>
+  
+  <!-- <inherits name='com.google.gwt.user.theme.clean.Clean'/> -->
+
+  <!-- Other module inherits                                      -->
+  <inherits name="com.github.gwtbootstrap.Bootstrap" />
+
+  <!-- Specify the app entry point class.                         -->
+  <entry-point class='ch.ethz.e4mooc.client.E4mooc'/>
+
+  <!-- Specify the paths for translatable code                    -->
+  <source path='client'/>
+  <source path='shared'/>
+
+</module>

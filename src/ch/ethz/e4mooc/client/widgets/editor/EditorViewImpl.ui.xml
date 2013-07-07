@@ -1,0 +1,40 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:b="urn:import:com.github.gwtbootstrap.client.ui">
+	<ui:style>
+		/* Add CSS here. See the GWT docs on UI Binder for more details */
+		
+		.ace {
+			max-width: 1024px;
+			min-height: 400px;
+			position: relative;
+			border: 1px solid silver;
+			clear: both;
+		}
+			
+		.reloadBtn {
+			position: relative;
+			float: right;
+		}
+		
+		.tabs {
+			margin-bottom: 0px;
+			border-bottom: 0px;
+		}
+	</ui:style>
+	
+	<g:HTMLPanel>		
+		<div style="float: none">
+			<div style="float: left; width: 95%;">
+				<b:NavTabs ui:field="navTabs" addStyleNames="{style.tabs}"></b:NavTabs>
+			</div>
+			<div style="float: left; width: 5%;">
+				<b:Button ui:field="reloadBtn" addStyleNames="{style.reloadBtn}"></b:Button>
+			</div>			
+		</div>
+		<div ui:field="aceContainer" class="{style.ace}">
+			<!-- Here we will insert the ace editor through native JS code -->
+		</div>
+	</g:HTMLPanel>
+</ui:UiBinder> 

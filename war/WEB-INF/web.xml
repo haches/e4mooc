@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+              http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         version="2.5"
+         xmlns="http://java.sun.com/xml/ns/javaee">
+
+  
+  <!-- Servlet to load at startup; serves the information and data of all Eiffel projects available on the server -->
+  <servlet>
+  	<servlet-name>projectServlet</servlet-name>
+  	<servlet-class>ch.ethz.e4mooc.server.ProjectServiceImpl</servlet-class>
+  	<load-on-startup>1</load-on-startup> <!-- this way, the init() of the class is called when loading the servlet -->
+  </servlet>
+  
+  <servlet-mapping>
+  	<servlet-name>projectServlet</servlet-name>
+  	<url-pattern>/e4mooc/project</url-pattern>
+  </servlet-mapping>  
+  
+  <!-- Servlet for compiling and running Eiffel programs on the server -->
+  <servlet>
+  	<servlet-name>executionServlet</servlet-name>
+  	<servlet-class>ch.ethz.e4mooc.server.ExecutionServiceImpl</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+  	<servlet-name>executionServlet</servlet-name>
+  	<url-pattern>/e4mooc/exec</url-pattern>
+  </servlet-mapping>
+  
+  
+  <!-- No a servlet but a simple class that's  -->     
+  <listener>
+		<description>Starts server threads on startup and shutdown of servlet context</description>
+    <display-name>ContextListener</display-name>
+    <listener-class>ch.ethz.e4mooc.server.ContextListener</listener-class>
+  </listener> 
+  
+  <!-- Default page to serve -->
+  <welcome-file-list>
+    <welcome-file>E4mooc.html</welcome-file>
+  </welcome-file-list>
+
+</web-app>
