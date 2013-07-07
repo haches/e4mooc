@@ -35,6 +35,7 @@ public class ProjectModel {
 	/** the relative path and file name of the ECF file */
 	private String ecfFileNameAndRelativePath;
 	
+	
 	/**
 	 * Constructor for a new project model.
 	 * @param projectName the name of the project (we use the name of the project folder on the server)
@@ -47,6 +48,7 @@ public class ProjectModel {
 		LOGGER.log(Level.INFO, "Creating project model for: " + projectName);
 	}
 	
+	
 	/**
 	 * Returns the name of this project, i.e. the name of the project folder on the server.
 	 * @return the name of this project.
@@ -54,6 +56,7 @@ public class ProjectModel {
 	public String getProjectName() {
 		return projectModelDTO.getProjectName();
 	}
+	
 	
 	/**
 	 * Adds a the name of a file to the project model's list of file names.
@@ -68,6 +71,7 @@ public class ProjectModel {
 		projectModelDTO.addFileName(fileName);
 	}
 	
+	
 	/**
 	 * Adds a file to the project model.
 	 * @param fileName the file name
@@ -76,6 +80,7 @@ public class ProjectModel {
 	public void addFile(String fileName, String fileContent) {
 		projectModelDTO.addFile(fileName, fileContent);
 	}
+	
 	
 	/**
 	 * Returns the list of all file names in the project represented by
@@ -86,6 +91,7 @@ public class ProjectModel {
 		return projectModelDTO.getFileNames();
 	}
 	
+	
 	/**
 	 * Returns the content of a file (as stored on the server) for a given file name.
 	 * @param fileName the name of file for which the content should be returned
@@ -94,6 +100,23 @@ public class ProjectModel {
 	public String getFileContent(String fileName) {
 		return projectModelDTO.getFileContent(fileName);
 	}
+	
+	
+	/**
+	 * Given a fileName, this method returns the relative path + the filename
+	 * of where the file is originally stored in the Eiffel project.
+	 * If no relative path is known for the given filename, the method returns
+	 * the filename itself. 
+	 * @param fileName the file name for which the relative path + file name should be returned
+	 * @return relative path and file name
+	 */
+	public String getRelativePathAndFileName(String fileName) {
+		if(fileNameToPathMap.containsKey(fileName))
+			return fileNameToPathMap.get(fileName);
+		else
+			return fileName;
+	}
+	
 
 	/**
 	 * Returns true if the project model has a file with the given file name.
@@ -126,6 +149,7 @@ public class ProjectModel {
 		this.ecfFileNameAndRelativePath = relativePathAndFileName;
 		LOGGER.log(Level.INFO, "ECF file of the project: " + relativePathAndFileName);
 	}
+	
 	
 	/**
 	 * Returns the ecf file and its relative path in the project.
