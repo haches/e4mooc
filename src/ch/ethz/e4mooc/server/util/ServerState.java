@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 import ch.ethz.e4mooc.shared.ProjectModelDTO;
 
@@ -134,13 +135,14 @@ public class ServerState {
 	public String getEcfFileNameWithoutAnyPath(String projectName) {
 		
 		if(ecfFileNameMap.contains(projectName))
+			// return result if already in cache
 			return ecfFileNameMap.get(projectName);
 		else {
 			String ecfFile = projectModelMap.get(projectName).getEcfFile();
 			ecfFile = ecfFile.substring(0, ecfFile.length() - 4);
-			String [] s = ecfFile.split(SEP);
+			String [] s = ecfFile.split(Pattern.quote(SEP));
 			ecfFile = s[s.length -1];
-			// cache the result
+			// cache the result for the next time around
 			ecfFileNameMap.put(projectName, ecfFile);
 			
 			return ecfFile;
