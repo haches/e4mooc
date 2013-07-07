@@ -8,8 +8,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.logging.Level;
-
-import com.sun.istack.internal.logging.Logger;
+import java.util.logging.Logger;
 
 import ch.ethz.e4mooc.shared.ProjectModelDTO;
 
@@ -27,7 +26,7 @@ import ch.ethz.e4mooc.shared.ProjectModelDTO;
 public class ProjectModel {
 
 	/** Logger for the Project Model */
-	private final static Logger LOGGER = Logger.getLogger(ch.ethz.e4mooc.server.util.ProjectModel.class);
+	private final static Logger LOGGER = Logger.getLogger(ch.ethz.e4mooc.server.util.ProjectModel.class.getName());
 	
 	/** the ProjectModelDTO that belongs to this ProjectModel */
 	private ProjectModelDTO projectModelDTO;
