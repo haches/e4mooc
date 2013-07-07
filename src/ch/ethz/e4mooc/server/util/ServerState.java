@@ -5,17 +5,12 @@ package ch.ethz.e4mooc.server.util;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
-
 import java.util.concurrent.ConcurrentHashMap;
-
-import ch.ethz.e4mooc.shared.ProjectModelDTO;
+import java.util.concurrent.locks.Lock;
 
 /**
  * This class represents state information of the server.
@@ -41,9 +36,6 @@ public class ServerState {
 	/** Maps a project name to the name of .ecf file that is used for compilation */
 	private ConcurrentHashMap<String, String> ecfFileNameMap;
 	
-	/** This lock will be used by the CleanUpListener to prevent all servlet threads from writing/reading tmp-project-folders */
-	Lock deleteLock;
-	
 	
 	/**
 	 * Private constructor as object creation is done through singleton pattern.
@@ -66,7 +58,6 @@ public class ServerState {
 
 		serverState = new ServerState();
 		return serverState;
-
 	}
 	
 	
@@ -85,7 +76,6 @@ public class ServerState {
 	 * @param pm a ProjectModel object
 	 */
 	public void addProjectModel(ProjectModel pm) {
-		
 		// add the PorjectModel to the map
 		projectModelMap.put(pm.getProjectName(), pm);
 		// and add the project's name to the list of names
