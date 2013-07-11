@@ -14,4 +14,7 @@ gwt-unitCache/
 war/WEB-INF/deploy/
 war/WEB-INF/classes/
 
+# generated files
+war/e4mooc
+
 .DS_Store
