@@ -17,4 +17,8 @@ war/WEB-INF/classes/
 # generated files
 war/e4mooc
 
+# gwt servlet
+war/WEB-INF/lib/gwt-servlet.jar
+
+
 .DS_Store
