@@ -6,9 +6,7 @@ package ch.ethz.e4mooc.server;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,7 +19,6 @@ import org.apache.commons.exec.Executor;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.exec.environment.EnvironmentUtils;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.RandomStringUtils;
 
 import ch.ethz.e4mooc.client.ExecutionService;
 import ch.ethz.e4mooc.server.util.ProjectModel;
@@ -52,6 +49,8 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
 		// get the session id
 		String sessionId = this.getThreadLocalRequest().getSession().getId();
 		
+		
+		LOGGER.log(Level.INFO, "Got request to \"Compile\" Eiffel project: " + projectName + ". Session id: " + sessionId);
 		
 		// first, we check if we got a valid time stamp from a previous compilation
 		// if yes AND the time stamp is not too old, we delete the previously generated tmp-compilation-folder
@@ -97,6 +96,7 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
 		cmdInstruction.addArgument(pathOfTmpFolder + SEP + ServerState.getState().getProjectModel(projectName).getEcfFile());
 		cmdInstruction.addArgument("-stop");
 		cmdInstruction.addArgument("-c_compile");
+		//cmdInstruction.addArgument("-freeze");	// we need freezing because only with C compilation can we redirect a programs output into a file
 		cmdInstruction.addArgument("-project_path");
 		cmdInstruction.addArgument(pathOfTmpFolderAndProject);
 		
@@ -114,11 +114,21 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
 		return result;
 	}
 	
-	/**
-	 * 
-	 */
+	@Override
 	public String execute(String projectName, String timeStamp) {
 		
+		String sessionId = this.getThreadLocalRequest().getSession().getId();
+		// the path to the temporary folder
+		String pathOfTmpFolder = e4moocTmp + SEP + sessionId + "_" + timeStamp;
+		// the path to the temporary folder + the folder with the project name
+		String pathOfTmpFolderAndProject = pathOfTmpFolder + SEP + projectName;
+		// get the name of the ecf file
+		String ecfFileName = ServerState.getState().getEcfFileNameWithoutAnyPath(projectName);
+		
+		LOGGER.log(Level.INFO, "Got request to \"Run\" Eiffel project: " + projectName + ". Session id: " + sessionId);
+		
+		
+		// first we check how long it's been since the program was compiled
 		Long timeOfLastCompilation = 0L;
 		try {
 			timeOfLastCompilation = Long.parseLong(timeStamp);
@@ -134,25 +144,111 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
 		CommandLine cmdInstruction = null;
 		String result = "Unable to run the program. Try to compile it again.\nIf the error remains, please report this via email to marco.piccioni{at}inf.ethz.ch";
 		
-		String sessionId = this.getThreadLocalRequest().getSession().getId();
-		// the path to the temporary folder
-		String pathOfTmpFolder = e4moocTmp + SEP + sessionId + "_" + timeStamp;
-		// the path to the temporary folder + the folder with the project name
-		String pathOfTmpFolderAndProject = pathOfTmpFolder + SEP + projectName;
-		// get the name of the ecf file
-		String ecfFileName = ServerState.getState().getEcfFileNameWithoutAnyPath(projectName);
+		// the path where the executable is stored (the generated W_code folder)
+		String W_codePath = pathOfTmpFolderAndProject + SEP + "EIFGENs" + SEP + ecfFileName + SEP + "W_code" + SEP;
 		
 		if(ServerProperties.isWindows) {
-			// we execute the program within a sandbox
-			cmdInstruction = getCommandLine(ServerProperties.SANDBOXIE);
-			cmdInstruction.addArgument(pathOfTmpFolderAndProject + SEP + "EIFGENs" + SEP + ecfFileName + SEP + "W_code" + SEP + ecfFileName + ".exe"); 
+			// on windows we execute the program inside a sandbox using www.sandboxie.com
+			// 1) we need to create a batch file which start the executable and redirects the output into a file
+			// 2) the output file is stored within the sandbox
+			// 3) we read the file, send it to the user and then delete it from the sandbox
+			
+			// create the content of  batch file: calling the executable and redirecting its output to a file
+			String e4moocTmpOutputFileName = W_codePath + "e4mooc_tmp_output.txt";
+			//String batchFileContent = "mkdir " + W_codePath + System.lineSeparator();
+			//batchFileContent += "copy NUL " + e4moocTmpOutputFileName + System.lineSeparator();
+			String batchFileContent = W_codePath + ecfFileName + ".exe > "  +  e4moocTmpOutputFileName + System.lineSeparator();
+			//batchFileContent += "timeout 1" + System.lineSeparator(); // sleep for a second
+			String batchFileName = W_codePath + "e4mooc_tmp_run.bat";
+			
+			
+			String dummyFileContent = "eJJN8nj>#])Wyk?5mapC" + System.currentTimeMillis();
+			
+			// NOTE: because of the strange behavior of Sandboxie we first create an empty
+			// file in the location where we'll store the output file that's generated by the batch file
+			File emptySandboxedFile = new File(ServerProperties.SANDBOXIE_DRIVE + SEP + e4moocTmpOutputFileName.replaceFirst(":", ""));
+			emptySandboxedFile.getParentFile().mkdirs();
+
+			try {
+				FileUtils.writeStringToFile(emptySandboxedFile, dummyFileContent);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+			
+			// next we have to create the batch file for running the Eiffel program and redirecting it's output into a file
+			try {
+				// try to write the batch file
+				writeInputTextToFile(batchFileContent, batchFileName);
+			} catch (IOException e) {
+				LOGGER.log(Level.SEVERE, "Exeception thrown while creating batch file: " + batchFileName);
+				System.err.println(e.getMessage());
+				e.printStackTrace();
+			}
+			
+			// now we have the batch file so we can run it within the sandbox			
+			cmdInstruction = getCommandLine(ServerProperties.SANDBOXIE_START);
+			cmdInstruction.addArgument("/hide_window");
+			cmdInstruction.addArgument("/wait");
+			cmdInstruction.addArgument(batchFileName);
+
+			
+			// run the program
+			result = execute(cmdInstruction, 1000 * 180); // timeout after 3 minutes (result will here actually be empty)
+			
+			// now there should exist and output file containing the the output from the executable
+			// it's stored in the Sandbox drive folder; NOTE: the filepath can't contain "C:\" but only "C", have to clean that up
+			File e4moocTmpOutput = new File(ServerProperties.SANDBOXIE_DRIVE + SEP + e4moocTmpOutputFileName.replaceFirst(":", ""));
+			if(FileUtils.waitFor(e4moocTmpOutput, 5)) {
+				try {
+					
+					try {
+						Thread.sleep(200);
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					
+					
+					int waitCounter = 0;
+					while(FileUtils.readFileToString(e4moocTmpOutput).equals(dummyFileContent) && waitCounter < 30) {
+						waitCounter++;
+						try {
+							Thread.sleep(200);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					
+					result = FileUtils.readFileToString(e4moocTmpOutput);
+					
+					// if we still have the dummy output in the file then there went something wrong.. so we return an error message
+					if(result.equals(dummyFileContent))
+						result = "There was a problem generating the output of your program. Try to compile and run it again." +
+								"\nIf the error remains, please report this via email to marco.piccioni{at}inf.ethz.ch";
+					
+					// we've read the result file from within the sandbox, now we need to delete it
+					FileUtils.deleteQuietly(new File(ServerProperties.SANDBOXIE_DRIVE + SEP + pathOfTmpFolder.replaceFirst(":", "")));
+				} catch (IOException e) {
+					LOGGER.log(Level.SEVERE, "Exeception when trying to read the content of: " + e4moocTmpOutputFileName);
+					System.err.println(e.getMessage());
+					e.printStackTrace();
+					result = "There was a problem reading the output generated by your program. Try to compile and run it again." +
+							"\nIf the error remains, please report this via email to ymarco.piccioni{at}inf.ethz.ch";
+				}
+			} else {
+				// we couldn't find an output file thus we return that info to the user
+				result = "There was a problem generating the output of your program. Try to compile and run it again." +
+						"\nIf the error remains, please report this via email to marco.piccioni{at}inf.ethz.ch";
+			}
 		}
 		else {
 			LOGGER.log(Level.WARNING, "NO SANDBOX: user program is execute with being sandboxed");
-			cmdInstruction = getCommandLine(pathOfTmpFolderAndProject + SEP + "EIFGENs" + SEP + ecfFileName + SEP + "W_code" + SEP + ecfFileName);
+			cmdInstruction = getCommandLine(W_codePath + ecfFileName);
+			result = execute(cmdInstruction, 1000 * 180); // timeout after 3 minutes
 		}
-		
-		result = execute(cmdInstruction, 1000 * 180); // timeout after 3 minutes
 		
 		// the user called this compile method thus we can set/update the time stamp for this project
 		ServerState.getState().setTmpFolderAndTimeStamp(pathOfTmpFolderAndProject);
@@ -256,7 +352,7 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
         PumpStreamHandler psh = new PumpStreamHandler(stdout);
 		
         // unblocking execution, thus we use DefaultExecuteResultHandler		
-		DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();	
+		//DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();	
 		// watchdog to terminate the execution after a certain amount of milliseconds
 		ExecuteWatchdog watchdog = new ExecuteWatchdog(timeout);
 		
@@ -265,21 +361,20 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
 		executor.setStreamHandler(psh);
 		try {
 
-			executor.execute(cmdInstruction, EnvironmentUtils.getProcEnvironment(), resultHandler);
-			resultHandler.waitFor();
-			
+			//executor.execute(cmdInstruction, EnvironmentUtils.getProcEnvironment(), resultHandler);
+			//resultHandler.waitFor();
+			int errorCode = executor.execute(cmdInstruction);
+						
 		} catch (ExecuteException e) {
 			System.err.println("ExecutionServiceImpl.execute: execution exception while executing " + cmdInstruction);
 			e.printStackTrace();
 		} catch (IOException e) {
 			System.err.println("ExecutionServiceImpl.execute: io exception while executing " + cmdInstruction);
 			e.printStackTrace();
-		} catch (InterruptedException e) {
-			System.err.println("ExecutionServiceImpl.execute: interrupt exception while executing " + cmdInstruction);
-			e.printStackTrace();
 		}
 		
 		// return whatever is in the stream
 		return stdout.toString();	
 	}
+	
 }

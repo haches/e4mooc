@@ -5,9 +5,9 @@ package ch.ethz.e4mooc.client.events;
 
 import java.util.List;
 
-import com.google.web.bindery.event.shared.Event;
-
 import ch.ethz.e4mooc.client.events.ToolNamesAvailableEvent.ToolNamesAvailableEventHandler;
+
+import com.google.web.bindery.event.shared.Event;
 
 /**
  * This event is fired by the ClientState

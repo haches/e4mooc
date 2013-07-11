@@ -5,7 +5,6 @@ package ch.ethz.e4mooc.client.page.root;
 
 
 import java.util.LinkedList;
-import java.util.Set;
 
 import ch.ethz.e4mooc.client.E4mooc;
 

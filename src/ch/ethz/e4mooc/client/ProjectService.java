@@ -4,7 +4,6 @@
 package ch.ethz.e4mooc.client;
 
 import java.util.LinkedList;
-import java.util.Set;
 
 import ch.ethz.e4mooc.shared.ProjectModelDTO;
 

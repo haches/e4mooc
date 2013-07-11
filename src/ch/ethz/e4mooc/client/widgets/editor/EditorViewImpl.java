@@ -6,8 +6,6 @@ package ch.ethz.e4mooc.client.widgets.editor;
 import java.util.LinkedList;
 import java.util.List;
 
-import ch.ethz.e4mooc.client.widgets.editor.EditorView.EditorPresenter;
-
 import com.github.gwtbootstrap.client.ui.Button;
 import com.github.gwtbootstrap.client.ui.NavLink;
 import com.github.gwtbootstrap.client.ui.NavTabs;

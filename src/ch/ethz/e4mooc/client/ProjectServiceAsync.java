@@ -4,11 +4,10 @@
 package ch.ethz.e4mooc.client;
 
 import java.util.LinkedList;
-import java.util.Set;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import ch.ethz.e4mooc.shared.ProjectModelDTO;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * @author hce

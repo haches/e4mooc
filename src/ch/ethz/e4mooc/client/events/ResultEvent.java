@@ -3,12 +3,12 @@
  */
 package ch.ethz.e4mooc.client.events;
 
+import ch.ethz.e4mooc.client.events.ResultEvent.ResultEventHandler;
+
 import com.google.gwt.event.shared.EventHandler;
 import com.google.web.bindery.event.shared.Event;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.HandlerRegistration;
-
-import ch.ethz.e4mooc.client.events.ResultEvent.ResultEventHandler;
 
 /**
  * @author hce

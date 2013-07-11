@@ -3,10 +3,10 @@
  */
 package ch.ethz.e4mooc.client.events;
 
-import com.google.web.bindery.event.shared.Event;
-
 import ch.ethz.e4mooc.client.events.ToolModelAvailableEvent.ToolModelAvailableEventHandler;
 import ch.ethz.e4mooc.shared.ToolModel;
+
+import com.google.web.bindery.event.shared.Event;
 
 /**
  * This event is fired by the ClientState

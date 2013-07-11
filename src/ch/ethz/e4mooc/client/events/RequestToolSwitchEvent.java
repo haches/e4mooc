@@ -3,9 +3,10 @@
  */
 package ch.ethz.e4mooc.client.events;
 
+import ch.ethz.e4mooc.client.events.RequestToolSwitchEvent.RequestToolSwitchEventHandler;
+
 import com.google.gwt.event.shared.EventHandler;
 import com.google.web.bindery.event.shared.Event;
-import ch.ethz.e4mooc.client.events.RequestToolSwitchEvent.RequestToolSwitchEventHandler;
 
 /**
  * This event is send to inform listeners

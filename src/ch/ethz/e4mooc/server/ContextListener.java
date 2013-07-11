@@ -3,9 +3,6 @@ package ch.ethz.e4mooc.server;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,7 +14,6 @@ import org.apache.commons.io.filefilter.FileFilterUtils;
 
 import ch.ethz.e4mooc.server.util.DirectoryWatcher;
 import ch.ethz.e4mooc.server.util.ServerProperties;
-import ch.ethz.e4mooc.server.util.ServerState;
 import ch.ethz.e4mooc.server.util.TmpDirCleaner;
 
 /**

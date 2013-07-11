@@ -30,6 +30,11 @@ public class ProjectServiceImpl extends RemoteServiceServlet implements ProjectS
 	
 	@Override
 	public LinkedList<String> getAllProjectNames() {
+		
+		LOGGER.log(Level.INFO, "Got request for all project names\n"
+				+ "Session id: " + this.getThreadLocalRequest().getSession().getId() + "\n"
+				+ "Time: " + new Date(System.currentTimeMillis()));
+		
 		LinkedList<String> result;
 		result = new LinkedList<String>(ServerState.getState().getProjectNames());
 		// the server state stores the project names as set (due to using a concurrent set)
@@ -41,7 +46,9 @@ public class ProjectServiceImpl extends RemoteServiceServlet implements ProjectS
 	
 	@Override
 	public ProjectModelDTO getProject(String projectName) {		
-		LOGGER.log(Level.INFO, "Project " + projectName + " requested by client at " + new Date(System.currentTimeMillis()));
+		LOGGER.log(Level.INFO, "Project " + projectName + " requested.\n"
+					+ "Session id: " + this.getThreadLocalRequest().getSession().getId() + "\n"
+					+ "Time: " + new Date(System.currentTimeMillis()));
 		return ServerState.getState().getProjectModel(projectName).getProjectModelDTO();
 	}
 

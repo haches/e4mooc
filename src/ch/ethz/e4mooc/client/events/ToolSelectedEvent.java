@@ -3,9 +3,10 @@
  */
 package ch.ethz.e4mooc.client.events;
 
+import ch.ethz.e4mooc.client.events.ToolSelectedEvent.ToolSelectedEventHandler;
+
 import com.google.gwt.event.shared.EventHandler;
 import com.google.web.bindery.event.shared.Event;
-import ch.ethz.e4mooc.client.events.ToolSelectedEvent.ToolSelectedEventHandler;
 
 /**
  * This event is send if a tool was selected

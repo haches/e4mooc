@@ -4,11 +4,7 @@
 package ch.ethz.e4mooc.client;
 
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
 
-import ch.ethz.e4mooc.client.events.RequestToolSwitchEvent;
-import ch.ethz.e4mooc.client.events.ToolSelectedEvent;
 import ch.ethz.e4mooc.client.page.eiffel.EiffelPagePresenter;
 import ch.ethz.e4mooc.client.page.eiffel.EiffelPageView;
 import ch.ethz.e4mooc.client.page.eiffel.EiffelPageViewImpl;

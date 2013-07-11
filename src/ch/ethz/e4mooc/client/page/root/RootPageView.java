@@ -4,8 +4,6 @@
 package ch.ethz.e4mooc.client.page.root;
 
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
 
 import ch.ethz.e4mooc.client.IPresenter;
 import ch.ethz.e4mooc.client.IView;

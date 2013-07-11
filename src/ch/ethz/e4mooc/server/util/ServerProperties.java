@@ -25,6 +25,8 @@ public interface ServerProperties {
 	public final String E4MOOC_PROJECTS_FOLDER = System.getenv("E4MOOC");
 	
 	/** the path to the Sandboxie application (a simple sandbox for windows) */
-	public final String SANDBOXIE = "C:\\Program Files\\Sandboxie\\Start.exe";
+	public final String SANDBOXIE_START = "C:\\Program Files\\Sandboxie\\Start.exe";
 	
+	/** the path to the drive used by the sandbox; when running programs, they store their output under this location */
+	public final String SANDBOXIE_DRIVE = "C:\\Sandbox\\cloud\\DefaultBox\\drive";
 }

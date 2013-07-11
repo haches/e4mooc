@@ -74,10 +74,10 @@ public class DirectoryWatcher extends Thread {
         if (trace) {
             Path prev = keys.get(key);
             if (prev == null) {
-                System.out.format("register: %s\n", dir);
+                LOGGER.log(Level.INFO, "Register: ", dir);
             } else {
                 if (!dir.equals(prev)) {
-                    System.out.format("update: %s -> %s\n", prev, dir);
+                	LOGGER.log(Level.INFO, "Update: " + prev + " -> " + dir);
                 }
             }
         }
@@ -148,7 +148,7 @@ public class DirectoryWatcher extends Thread {
                 Path child = dir.resolve(name);
  
                 // print out event
-                System.out.format("%s: %s\n", event.kind().name(), child);
+                LOGGER.log(Level.INFO, event.kind().name() + ":" + child);
                 
                 // now we determine the project folder in which the change (i.e. added, deleted, modified) occurred
                 // the changed project folder is than re-read and stored/removed from the server state
@@ -160,7 +160,7 @@ public class DirectoryWatcher extends Thread {
                 // we remove the common E4Mooc path and get the relative path (relative to E4MOOC) where the change occurred
                 String relativePathOfChange = filePathWhereChangeOccured.toString().substring(lengthOfParentPath); 
                 // we separate the folder names; the first folder name is the project name
-                String [] pathElements = relativePathOfChange.split(SEP);
+                String [] pathElements = relativePathOfChange.split(Pattern.quote(SEP));
                 // Note: the folder name is in array position 1 because of the leading SEP (e.g. as in: /project_folder/cluster_name/...)
                 String modifiedProjectPath = e4moocFilePath + SEP + pathElements[1];
                 
@@ -226,6 +226,8 @@ public class DirectoryWatcher extends Thread {
 		
 		// generate a file for the projectFilePath
 		File f = new File(projectFilePath);
+		
+		// is the project file path valid?
 		if(!f.exists()) {
 			// the project folder does not exists. So either the given
 			// projectFilePath is wrong or the project existed once but
@@ -235,60 +237,70 @@ public class DirectoryWatcher extends Thread {
 			
 		} else if(f.isDirectory()) { // we only handle folders as all projects are stored in folders at E4MOOC
 			
-			// generate a project model for the current project
-			ProjectModel pm = new ProjectModel(f.getName());
+			ProjectModel pm = null;
 			
-			// check if the project folder contains a black.list file
-			Collection<File> blackListFiles = FileUtils.listFiles(f, new String [] {"list"}, true);
-			for(File blackListFile: blackListFiles) {
-				if(blackListFile.getName().equals("black.list")) {
-					try {
-						// get all the lines in the file
-						List<String> linesInFile = FileUtils.readLines(blackListFile);
-						// add each line to the black list
-						blackList.addAll(linesInFile);
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+			try {
+			
+				// generate a project model for the current project
+				pm = new ProjectModel(f.getName());
+				
+				// check if the project folder contains a black.list file
+				Collection<File> blackListFiles = FileUtils.listFiles(f, new String [] {"list"}, true);
+				for(File blackListFile: blackListFiles) {
+					if(blackListFile.getName().equals("black.list")) {
+						try {
+							// get all the lines in the file
+							List<String> linesInFile = FileUtils.readLines(blackListFile);
+							// add each line to the black list
+							blackList.addAll(linesInFile);
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 				}
-			}
-			
-			// get all the Eiffel files (i.e. the files ending with ".e")
-			Collection<File> eiffelFiles = FileUtils.listFiles(f, new String[] {"e"}, true);
-			for(File ef: eiffelFiles) {
 				
-				// check that the current file is not on the black list
-				if(!blackList.contains(ef.getName())) {
-				
-					String fileContent = "Server reports: there was a problem while reading the file content.";
+				// get all the Eiffel files (i.e. the files ending with ".e")
+				Collection<File> eiffelFiles = FileUtils.listFiles(f, new String[] {"e"}, true);
+				for(File ef: eiffelFiles) {
 					
-					try {
-						fileContent = FileUtils.readFileToString(ef);
-					} catch (IOException e) {
-						e.printStackTrace();
-					} finally {
+					// check that the current file is not on the black list
+					if(!blackList.contains(ef.getName())) {
+					
+						String fileContent = "Server reports: there was a problem while reading the file content.";
 						
-						// get the relative path of the Eiffel file. We need this path info when replacing the original
-						// Eiffel file with the one that was modified by the user
-						String relativeFilePath = getRelativePath(ef.getPath(), f.getPath(), SEP);
-		
-						// add the file and it's content the the project model
-						pm.addFileName(ef.getName(), relativeFilePath);
-						pm.addFile(ef.getName(), fileContent);
+						try {
+							fileContent = FileUtils.readFileToString(ef);
+						} catch (IOException e) {
+							e.printStackTrace();
+						} finally {
+							
+							// get the relative path of the Eiffel file. We need this path info when replacing the original
+							// Eiffel file with the one that was modified by the user
+							String relativeFilePath = getRelativePath(ef.getPath(), f.getPath(), SEP);
+			
+							// add the file and it's content the the project model
+							pm.addFileName(ef.getName(), relativeFilePath);
+							pm.addFile(ef.getName(), fileContent);
+						}
 					}
 				}
-			}
+				
+				// get the ecf file of this project and store it in the project model
+				// note: we should only have a single ecf file. If there are multiple, the project model will only keep the last one.
+				Collection<File> ecfFiles = FileUtils.listFiles(f, new String[] {"ecf"}, true);
+				for(File ecfFile: ecfFiles) {
+					pm.setEcfFile(getRelativePath(ecfFile.getPath(), f.getParent(), SEP));
+				}
+				
+				ServerState.getState().addProjectModel(pm);
 			
-			// get the ecf file of this project and store it in the project model
-			// note: we should only have a single ecf file. If there are multiple, the project model will only keep the last one.
-			Collection<File> ecfFiles = FileUtils.listFiles(f, new String[] {"ecf"}, true);
-			for(File ecfFile: ecfFiles) {
-				pm.setEcfFile(getRelativePath(ecfFile.getPath(), f.getParent(), SEP));
-			}
-			
-			// store the project model in the server state
-			ServerState.getState().addProjectModel(pm);
+			}catch(Exception e) {
+				LOGGER.log(Level.SEVERE, "Exception while trying to add a project model for: " + 
+											projectFilePath + "\nNo project model will be added.");
+				System.err.println(e.getMessage());
+				e.printStackTrace();
+			}				
 		}
 	}
 	
@@ -385,10 +397,8 @@ public class DirectoryWatcher extends Thread {
         
 		
         try {
-            System.out.format("Scanning %s ...\n", e4moocFilePath);
+        	LOGGER.log(Level.INFO, "Scanning " + e4moocFilePath);
             registerAll(Paths.get(e4moocFilePath));
-            System.out.println("Done.");
-        	
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

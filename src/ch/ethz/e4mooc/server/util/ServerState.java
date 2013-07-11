@@ -6,16 +6,9 @@ package ch.ethz.e4mooc.server.util;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
-
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
-
-import ch.ethz.e4mooc.shared.ProjectModelDTO;
 
 /**
  * This class represents state information of the server.

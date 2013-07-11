@@ -4,15 +4,13 @@
 package ch.ethz.e4mooc.client.page.eiffel;
 
 import ch.ethz.e4mooc.client.E4mooc;
+import ch.ethz.e4mooc.client.events.CompilationStartedEvent;
 import ch.ethz.e4mooc.client.events.ResultEvent;
 import ch.ethz.e4mooc.client.events.ResultEvent.ResultEventHandler;
 import ch.ethz.e4mooc.client.events.TabSelectedEvent;
-import ch.ethz.e4mooc.client.events.CompilationStartedEvent;
-import ch.ethz.e4mooc.client.events.ToolModelAvailableEvent;
 import ch.ethz.e4mooc.client.widgets.cmdline.CmdLinePresenter;
 import ch.ethz.e4mooc.client.widgets.editor.EditorPresenter;
 import ch.ethz.e4mooc.shared.ProjectModelDTO;
-import ch.ethz.e4mooc.shared.ToolModel;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HasWidgets;

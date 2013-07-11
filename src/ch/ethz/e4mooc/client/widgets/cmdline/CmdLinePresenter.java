@@ -6,9 +6,9 @@ package ch.ethz.e4mooc.client.widgets.cmdline;
 import java.util.HashMap;
 
 import ch.ethz.e4mooc.client.E4mooc;
+import ch.ethz.e4mooc.client.events.CompilationStartedEvent;
 import ch.ethz.e4mooc.client.events.ResultEvent;
 import ch.ethz.e4mooc.client.events.TabSelectedEvent;
-import ch.ethz.e4mooc.client.events.CompilationStartedEvent;
 import ch.ethz.e4mooc.shared.CompilationResultDTO;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -113,6 +113,11 @@ public class CmdLinePresenter implements CmdLineView.CmdLinePresenter {
 		// we disable the buttons while the programm is running
 		view.setCompileBtnEnabled(false, "Compile");
 		view.setRunButtonEnabled(false, "Running");
+		
+		// send out an event to other widgets that a new compilation was started (even though it's not really a compilation here)
+		// the EiffelPresenter will the clear the output 
+		eventBus.fireEvent(new CompilationStartedEvent());		
+		
 
 		String projectName = E4mooc.cState.getProjectName();
 		E4mooc.execService.execute(projectName, timeStamp, new AsyncCallback<String>() {

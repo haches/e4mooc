@@ -83,8 +83,10 @@ public class EditorPresenter implements EditorView.EditorPresenter {
 		// add all the tabs
 		view.addTabs(fileNames);
 		
-		if(fileNames.size() > 0)
+		if(fileNames.size() > 0) {
 			view.setEditorText(E4mooc.cState.getContentOfFile(0));
+			view.updateSelectedTab(0);
+		}
 	}
 	
 	

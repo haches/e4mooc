@@ -7,7 +7,6 @@ import java.util.List;
 
 import ch.ethz.e4mooc.client.IPresenter;
 import ch.ethz.e4mooc.client.IView;
-import ch.ethz.e4mooc.shared.ExampleModel;
 
 
 /**
@@ -36,7 +35,9 @@ public interface EditorView extends IView<EditorPresenter> {
 		public void onReloadBtnClick(int tabIndex);
 		
 		/**
-		 * Adds tabs to the editor where each tab represents an file using it's file name
+		 * Adds tabs to the editor where each tab represents a file using it's file name.
+		 * Sets the editor to display the content of the first file (retrieved from the client state).
+		 * Sets the first tab as active.
 		 * @param fileNames list of fileNames
 		 */
 		public void addFiles (List<String> fileNames);
