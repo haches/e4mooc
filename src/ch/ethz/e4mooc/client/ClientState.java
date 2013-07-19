@@ -71,6 +71,9 @@ public class ClientState {
 		// store the project model
 		this.projectModel = pm;
 		
+		// clear out the user-storage (in case the new PM has a file with the same name)
+		userStorage.clear();
+		
 		// counter for the tab index
 		int counter = 0;
 		
@@ -78,9 +81,6 @@ public class ClientState {
 		for(String fileName: pm.getFileNames()) {
 			tabIndexToFileNameMap.put(counter, fileName);
 			counter++;
-			
-			// store the files in the user storage
-			// userStorage.put(fileName, pm.getFileContent(fileName));
 		}
 	}
 
@@ -175,5 +175,4 @@ public class ClientState {
 		if(userStorage.containsKey(fileName))
 			userStorage.remove(fileName);	
 	}
-	
 }
