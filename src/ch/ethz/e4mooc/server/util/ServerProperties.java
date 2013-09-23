@@ -11,11 +11,15 @@ package ch.ethz.e4mooc.server.util;
  *
  */
 public interface ServerProperties {
-
+	
+	/** which operating system runs on the server; does it have a sand-box setup */
+	public final ServerSystem SERVER_SYSTEM = ServerSystem.OTHER;
+	
 	/** the path separtor used by the operating system */
 	public final String SEP = System.getProperty("file.separator");
 	
 	/** is true if the current system is windows */
+	@Deprecated
 	public static final boolean isWindows = System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
 	
 	/** the folder were the tmp folders of compiled project should be stored */

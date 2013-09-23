@@ -24,6 +24,7 @@ import ch.ethz.e4mooc.client.ExecutionService;
 import ch.ethz.e4mooc.server.util.ProjectModel;
 import ch.ethz.e4mooc.server.util.ServerProperties;
 import ch.ethz.e4mooc.server.util.ServerState;
+import ch.ethz.e4mooc.server.util.ServerSystem;
 import ch.ethz.e4mooc.shared.CompilationResultDTO;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -147,7 +148,7 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
 		// the path where the executable is stored (the generated W_code folder)
 		String W_codePath = pathOfTmpFolderAndProject + SEP + "EIFGENs" + SEP + ecfFileName + SEP + "W_code" + SEP;
 		
-		if(ServerProperties.isWindows) {
+		if(ServerProperties.SERVER_SYSTEM == ServerSystem.WIN_SANDBOXED) {
 			// on windows we execute the program inside a sandbox using www.sandboxie.com
 			// 1) we need to create a batch file which start the executable and redirects the output into a file
 			// 2) the output file is stored within the sandbox
@@ -244,10 +245,22 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
 						"\nIf the error remains, please report this via email to marco.piccioni{at}inf.ethz.ch";
 			}
 		}
-		else {
-			LOGGER.log(Level.WARNING, "NO SANDBOX: user program is execute with being sandboxed");
-			cmdInstruction = getCommandLine(W_codePath + ecfFileName);
+		else if (ServerProperties.SERVER_SYSTEM == ServerSystem.LINUX_SANBOXED) {
+			// if we are running a sandboxed Linux, we use "schroot" for the sandboxing
+			cmdInstruction = getCommandLine("schroot");
+			cmdInstruction.addArgument("-c");
+			cmdInstruction.addArgument("e4mooc");
+			// HACK: we have to provide "schroot" a path that acutally exists for it
+			// but at this point, the W_codePath looks like this "/srv/chroot/e4mooc/tmp/..." but we need "/tmp/..."
+			cmdInstruction.addArgument(W_codePath.substring(18) + ecfFileName);
+			LOGGER.log(Level.INFO, "Executeing usr program using: " + cmdInstruction.toString());
+			
 			result = execute(cmdInstruction, 1000 * 180); // timeout after 3 minutes
+		}
+		else {
+			cmdInstruction = getCommandLine(W_codePath + ecfFileName);
+			LOGGER.log(Level.WARNING, "NO SANDBOX! Executeing usr program using: " + cmdInstruction.toString());
+			result = execute(cmdInstruction, 1000 * 180); // timeout after 3 minutes			
 		}
 		
 		// the user called this compile method thus we can set/update the time stamp for this project
@@ -359,6 +372,9 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
 		Executor executor = new DefaultExecutor();
 		executor.setWatchdog(watchdog);
 		executor.setStreamHandler(psh);
+		// we want to start the program form the root directory 
+		executor.setWorkingDirectory(new File("/"));
+		
 		try {
 
 			//executor.execute(cmdInstruction, EnvironmentUtils.getProcEnvironment(), resultHandler);
