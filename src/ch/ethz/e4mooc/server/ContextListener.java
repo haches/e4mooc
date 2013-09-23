@@ -40,6 +40,8 @@ public class ContextListener implements ServletContextListener{
 	@Override
 	public void contextInitialized(ServletContextEvent arg0) {
 		
+		LOGGER.log(Level.INFO, "Variable E4MOOC: " + ServerProperties.E4MOOC_PROJECTS_FOLDER);
+		LOGGER.log(Level.INFO, "Variable E4MOOC_TMP: " + e4moocTmpFolderPath);
 		LOGGER.log(Level.INFO, "Loading ContextListener; deleting tmp folders");
 		deleteAllTmpFiles();
 		
