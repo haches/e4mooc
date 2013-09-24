@@ -14,6 +14,7 @@ import ch.ethz.e4mooc.client.page.root.RootPageViewImpl;
 
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -64,6 +65,8 @@ public class AppController implements ValueChangeHandler<String> {
 	private void switchToRootPage() {
 		RootPanel.get().clear();
 		rootPageView = new RootPageViewImpl();
+		// HACK: for now, we create a new EventBus for each page because we all presenters don't unbind(), meaning that "invisible" presenters keep listening to eventbus
+		eventBus = new SimpleEventBus();
 		rootPagePresenter = new RootPagePresenter(this.eventBus, rootPageView);
 		
 		rootPagePresenter.go(RootPanel.get());
@@ -77,6 +80,8 @@ public class AppController implements ValueChangeHandler<String> {
 	private void switchToEiffelPage(String projectName) {
 		RootPanel.get().clear();
 		eiffelView = new EiffelPageViewImpl();
+		// HACK: for now, we create a new EventBus for each page because we all presenters don't unbind(), meaning that "invisible" presenters keep listening to eventbus
+		eventBus = new SimpleEventBus();
 		eiffelPagePresenter = new EiffelPagePresenter(this.eventBus, eiffelView, projectName);
 		
 		eiffelPagePresenter.go(RootPanel.get());
