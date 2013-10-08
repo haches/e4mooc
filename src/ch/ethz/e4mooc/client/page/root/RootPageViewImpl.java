@@ -65,20 +65,9 @@ public class RootPageViewImpl extends Composite implements RootPageView {
 
 	@Override
 	public void addProjectNames(LinkedList<String> projectNames) {
-//		for(String projectName: projectNames) {
-//			
-//			// create a hyperlink for the project name; clicking it will cause a history event
-//			Hyperlink hl = new Hyperlink(projectName, projectName);
-//			
-//			// create a list element
-//			Element li = DOM.createElement("li");	
-//			// and attach the hyperlink element to it
-//			li.appendChild(hl.getElement());
-//			
-//			// attach the list element onto the list
-//			projectList.appendChild(li);
-//		}
 		
+		// text shown on the button that's used to show the IFRAME code
+		final String btnText = "Share";
 		
 		int numOfProjects = projectNames.size(); 
 		// add as many rows to the table as we have project names (+1 for the header)
@@ -105,7 +94,7 @@ public class RootPageViewImpl extends Composite implements RootPageView {
 			else
 				projectGrid.getRowFormatter().addStyleName(i, "uneven");
 			
-			final Button b = new Button("Show code");
+			final Button b = new Button(btnText);
 			b.setType(ButtonType.DEFAULT);
 			b.addStyleName("share-Button");
 			
@@ -116,14 +105,14 @@ public class RootPageViewImpl extends Composite implements RootPageView {
 					
 					if(vPanel.getWidgetCount() > 1) {
 					 // we're displaying more the than the button, thus a click on the button should hide everyting
-						b.setText("Show code");
+						b.setText(btnText);
 						vPanel.remove(1);
 					}
 					else {
-						b.setText("Hide code");
+						b.setText(btnText);
 						TextArea code = new TextArea();
 						code.setWidth("273px");
-						code.setHeight("76px");
+						code.setHeight("100px");
 						code.setText("<iframe width=\"800\" height=\"1000\"\nsrc=\"http://bmse-sandbox.inf.ethz.ch:8080/e4mooc/#" + projectName + "\" frameborder=\"0\"></iframe>");
 						vPanel.add(code);
 					}

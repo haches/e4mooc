@@ -109,10 +109,10 @@
 			<g:Grid ui:field="projectGrid" addStyleNames="{style.grid}">
 			  <g:row styleName="{style.gridHeaderStyle}">
 			    <g:cell styleName="{style.gridCellProject}">
-			      <div>Project</div>
+			    		<div>Project (click to open)</div>
 			    </g:cell>
 			    <g:cell styleName="{style.gridCellShare}">
-			      <div>Share</div>
+			      <div>Share (embed in websites)</div>
 			    </g:cell>			    
 			  </g:row>
 			</g:Grid>
