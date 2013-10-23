@@ -1,6 +1,5 @@
-#E4MOOC - Eiffel 4 Massive Open Online Courses 
-
-A web application that allows to display, modify, compile and run Eiffel programs in the browser.
+#E4MOOC
+E4MOOC is short for *Eiffel 4 Massive Open Online Courses*-. It's a web application that allows to display, modify, compile and run Eiffel programs in the browser.
 
 ## URL structure
 
