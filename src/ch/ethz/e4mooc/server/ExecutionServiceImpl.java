@@ -118,6 +118,8 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
 	@Override
 	public String execute(String projectName, String timeStamp) {
 		
+		long killExecutionAfterMilliSeconds = 1000 * 30; // we want to time-out the execution of a program after 30 seconds
+		
 		String sessionId = this.getThreadLocalRequest().getSession().getId();
 		// the path to the temporary folder
 		String pathOfTmpFolder = e4moocTmp + SEP + sessionId + "_" + timeStamp;
@@ -196,9 +198,9 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
 
 			
 			// run the program
-			result = execute(cmdInstruction, 1000 * 180); // timeout after 3 minutes (result will here actually be empty)
+			result = execute(cmdInstruction, killExecutionAfterMilliSeconds);
 			
-			// now there should exist and output file containing the the output from the executable
+			// now there should exist an output file containing the the output from the executable
 			// it's stored in the Sandbox drive folder; NOTE: the filepath can't contain "C:\" but only "C", have to clean that up
 			File e4moocTmpOutput = new File(ServerProperties.SANDBOXIE_DRIVE + SEP + e4moocTmpOutputFileName.replaceFirst(":", ""));
 			if(FileUtils.waitFor(e4moocTmpOutput, 5)) {
@@ -255,12 +257,12 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
 			cmdInstruction.addArgument(W_codePath.substring(18) + ecfFileName);
 			LOGGER.log(Level.INFO, "Executeing usr program using: " + cmdInstruction.toString());
 			
-			result = execute(cmdInstruction, 1000 * 180); // timeout after 3 minutes
+			result = execute(cmdInstruction, killExecutionAfterMilliSeconds);
 		}
 		else {
 			cmdInstruction = getCommandLine(W_codePath + ecfFileName);
 			LOGGER.log(Level.WARNING, "NO SANDBOX! Executeing usr program using: " + cmdInstruction.toString());
-			result = execute(cmdInstruction, 1000 * 180); // timeout after 3 minutes			
+			result = execute(cmdInstruction, killExecutionAfterMilliSeconds);			
 		}
 		
 		// the user called this compile method thus we can set/update the time stamp for this project
@@ -376,14 +378,18 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
 		executor.setWorkingDirectory(new File("/"));
 		
 		try {
-
-			//executor.execute(cmdInstruction, EnvironmentUtils.getProcEnvironment(), resultHandler);
-			//resultHandler.waitFor();
-			int errorCode = executor.execute(cmdInstruction);
-						
+			
+			int exitValue = executor.execute(cmdInstruction);	
+			
 		} catch (ExecuteException e) {
-			System.err.println("ExecutionServiceImpl.execute: execution exception while executing " + cmdInstruction);
-			e.printStackTrace();
+			if(watchdog.killedProcess()) // the execution watch dog killed the program
+				//TODO: this message should only appear when running a program but not when compiling it. Right now, it does for both cases.
+				return "Your application was running for more than " + Math.floor(timeout / 1000) + " seconds. "
+						+ "Thus, we terminated it for you.\nMaybe the program got stuck in an infinite loop? Please check your code.";
+			else {
+				System.err.println("ExecutionServiceImpl.execute: execution exception while executing " + cmdInstruction);
+				e.printStackTrace();
+			}
 		} catch (IOException e) {
 			System.err.println("ExecutionServiceImpl.execute: io exception while executing " + cmdInstruction);
 			e.printStackTrace();
