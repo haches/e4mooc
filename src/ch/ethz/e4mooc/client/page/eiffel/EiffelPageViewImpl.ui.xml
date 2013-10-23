@@ -14,7 +14,8 @@
 			border: 1px solid silver;
 			border-radius: 5px;
 			max-width: 1024px;
-			height: 250px;
+			/* the hight is set dynamically to a user value or default of 250 */
+			/* height: 250px; */
 			width: 99%;
 			cursor: text !important;
 			padding: .5%;

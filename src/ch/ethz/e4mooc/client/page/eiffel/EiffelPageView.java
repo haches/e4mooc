@@ -53,4 +53,17 @@ public interface EiffelPageView extends IView<EiffelPageView.Presenter>, IsWidge
 	 */
 	void setDefaultOutputText();
 	
+	
+	/**
+	 * Sets the height of the output box.
+	 * @param height height value in pixels
+	 */
+	void setOutputBoxHeight(int height);
+	
+	
+	/**
+	 * Sets the background color of the Eiffel project page.
+	 * @param color a hex-formated string
+	 */
+	void setBackgroundColor(String color);
 }

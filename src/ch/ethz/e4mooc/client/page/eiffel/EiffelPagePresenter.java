@@ -74,6 +74,10 @@ public class EiffelPagePresenter implements EiffelPageView.Presenter {
 		// assign this presenter to the view
 		view.setPresenter(this);
 		
+		// set user specific background color and height of output box
+		view.setOutputBoxHeight(E4mooc.cState.getUserOutputBoxHeight());
+		view.setBackgroundColor(E4mooc.cState.getUserBackgroundColor());
+		
 //		// handler for events that indicate that a tool model is available
 //		eventBus.addHandler(ToolModelAvailableEvent.TYPE, new ToolModelAvailableEvent.ToolModelAvailableEventHandler() {
 //			

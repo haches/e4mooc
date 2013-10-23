@@ -3,7 +3,9 @@
  */
 package ch.ethz.e4mooc.client;
 
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import ch.ethz.e4mooc.client.page.eiffel.EiffelPagePresenter;
 import ch.ethz.e4mooc.client.page.eiffel.EiffelPageView;
@@ -15,6 +17,7 @@ import ch.ethz.e4mooc.client.page.root.RootPageViewImpl;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.SimpleEventBus;
+import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -91,19 +94,19 @@ public class AppController implements ValueChangeHandler<String> {
 	@Override
 	public void onValueChange(ValueChangeEvent<String> event) {
 		
-		final String token = event.getValue();
-		
+		// the projectNameUri is the part of the URI that contains the project name (e.g. hello_world of #hello_world?id=5)
+		final String projectNameUri = extractQueryParameters(event.getValue());
+
 		// check if the server has a project which name equals the token
 		// if yes, then load the Eiffel page for this project
-		
-		if(token != null) {
+		if(projectNameUri != null) {
 			
-			E4mooc.projectService.hasProject(token, new AsyncCallback<Boolean>() {
+			E4mooc.projectService.hasProject(projectNameUri, new AsyncCallback<Boolean>() {
 
 				@Override
 				public void onSuccess(Boolean result) {
 					if(result)
-						switchToEiffelPage(token);
+						switchToEiffelPage(projectNameUri);
 					else
 						switchToRootPage();
 				}
@@ -114,6 +117,53 @@ public class AppController implements ValueChangeHandler<String> {
 				}
 			});
 		}
+	}
+	
+	/**
+	 * Extracts the parameters from the query part of a URI.
+	 * @param uriQuery the query part of a URI.
+	 * @return the URI without the query part
+	 */
+	private String extractQueryParameters(String uriQuery) {
+		// we initialize the return value to the user-given URI
+		String result  = uriQuery;
+		
+		// check if the token contains any query parameters (i.e. ?field1=value1&field2=value2&field3=value3...)
+		if(uriQuery.contains("?")) {
+			// split the URI where the query part start (indicated by ?)
+			String[] uriParts = uriQuery.split("\\?");
+			
+			// if there are more than two elements in uriParts[], then there was something wrong with the URI and stop processing it further
+			if(uriParts.length == 2) {
+				// the URI part at index 0 is the project name; we store that in the token as it's used for selecting the presenter
+				result = uriParts[0];
+				
+				// the URI part at index 1 are the query parameters
+				Map<String, String> queryParameters = getParameterMap(uriParts[1]);
+				// we store the parameters in the client state
+				if(queryParameters.containsKey("id"))
+					E4mooc.cState.setUserId(queryParameters.get("id"));
+				if(queryParameters.containsKey("outputht"))
+					E4mooc.cState.setUserOutputBoxHeight(Integer.valueOf(queryParameters.get("outputht")));
+				if(queryParameters.containsKey("bgcolor"))
+					E4mooc.cState.setUserBackgroundColor(queryParameters.get("bgcolor"));
+			}
+		}
+		
+		System.out.println("Project URI: " + result);
+		return result;
+	}
+	
+	private Map<String, String> getParameterMap(String parameterString) {
+		Map<String, String> result = new HashMap<String, String>();
+		// split at each '&' and put the pairs in the result map
+		String[] pairs = parameterString.split("&");
+		for(String pair: pairs) {
+			int idx = pair.indexOf("=");
+			// have to decode the Url to get the original strings (e.g. space is %20 in Url formatting)
+			result.put(URL.decode(pair.substring(0, idx)), URL.decode(pair.substring(idx + 1)));
+		}
+		return result;
 	}
 	
 
@@ -131,9 +181,11 @@ public class AppController implements ValueChangeHandler<String> {
 			// if the URL has a history token equaling a project name, we switch to the Eiffel page for that project
 			@Override
 			public void onSuccess(LinkedList<String> result) {
+				
+				final String projectNameUri = extractQueryParameters(History.getToken());
 				// check if the there's a project with the name of the history token; if yes, switch to Eiffel page
-				if(result.contains(History.getToken()))
-					switchToEiffelPage(History.getToken());
+				if(result.contains(projectNameUri))
+					switchToEiffelPage(projectNameUri);
 			}
 			
 			@Override

@@ -38,6 +38,16 @@ public class ClientState {
 	private Map<String, String> userStorage;
 	
 	/**
+	 * the following fields are about storing Uri parameters
+	 */
+	/** the id of the user */
+	private String userId;
+	/** the height of the output box that shows the result */
+	private int outputBoxHeight;
+	/** the color of the background */
+	private String backgroundColor;
+	
+	/**
 	 * 
 	 * @param eventBus the eventBus used throughout the application
 	 */
@@ -45,6 +55,12 @@ public class ClientState {
 		this.eventBus = eventBus;
 		tabIndexToFileNameMap = new HashMap<Integer, String>();
 		userStorage = new HashMap<String, String>();
+		
+		// initialize default values for user properties
+		userId = "";
+		outputBoxHeight = 250;
+		backgroundColor = "#FFFFFF"; // set it to white
+		
 		bind();
 	}
 	
@@ -174,5 +190,56 @@ public class ClientState {
 		
 		if(userStorage.containsKey(fileName))
 			userStorage.remove(fileName);	
+	}
+	
+	
+	/**
+	 * Returns the id of the user who's using the current project.
+	 * @return empty string for unknown users; otherwise the user id; 
+	 */
+	public String getUserId() {
+		return userId;
+	}
+	
+	
+	/**
+	 * Stores the given id in the client state.
+	 * @param userId id of a user
+	 */
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+	
+	/**
+	 * Returns the user's preferred height for the output box.
+	 * @return value of preferred height or a default value
+	 */
+	public int getUserOutputBoxHeight() {
+		return outputBoxHeight;
+	}
+	
+	
+	/**
+	 * Set the user's preferred height for the output box.
+	 * @param outputBoxHeight height value
+	 */
+	public void setUserOutputBoxHeight(int outputBoxHeight) {
+		this.outputBoxHeight = outputBoxHeight;
+	}
+	
+	/**
+	 * Returns the user's preferred background color.
+	 * @return hex-formated color; by default that's white (#FFFFFF)
+	 */
+	public String getUserBackgroundColor() {
+		return this.backgroundColor;
+	}
+	
+	/**
+	 * Set the user's preferred background color
+	 * @param backgroundColor a color formated in hex-format (e.g.#FFFFFF)
+	 */
+	public void setUserBackgroundColor(String backgroundColor) {
+		this.backgroundColor = backgroundColor;
 	}
 }

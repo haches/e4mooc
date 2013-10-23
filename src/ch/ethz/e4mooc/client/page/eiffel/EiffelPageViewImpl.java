@@ -12,9 +12,11 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.ParagraphElement;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -30,6 +32,8 @@ public class EiffelPageViewImpl extends Composite implements EiffelPageView {
 	interface SimplePageViewImplUiBinder extends UiBinder<Widget, EiffelPageViewImpl> {
 	}
 	
+	@UiField
+	HTMLPanel mainPanel;
 	@UiField
 	EditorViewImpl editorView;
 	@UiField
@@ -99,5 +103,15 @@ public class EiffelPageViewImpl extends Composite implements EiffelPageView {
 	
 	public void setDefaultOutputText() {
 		setOutputText("This will display the output!");
+	}
+
+	@Override
+	public void setOutputBoxHeight(int height) {
+		outputDiv.getStyle().setHeight(height, Unit.PX);
+	}
+
+	@Override
+	public void setBackgroundColor(String color) {
+		mainPanel.getElement().getStyle().setBackgroundColor(color);
 	}
 }
