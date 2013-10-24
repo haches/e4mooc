@@ -42,6 +42,8 @@ public class ClientState {
 	 */
 	/** the id of the user */
 	private String userId;
+	/** the group-id of the user */
+	private String groupId;
 	/** the height of the output box that shows the result */
 	private int outputBoxHeight;
 	/** the color of the background */
@@ -209,6 +211,24 @@ public class ClientState {
 	public void setUserId(String userId) {
 		this.userId = userId;
 	}
+	
+	/**
+	 * Returns the group-id of the user who's using the current project.
+	 * @return empty string for unknown users; otherwise the user id; 
+	 */
+	public String getUserGroupId() {
+		return groupId;
+	}
+	
+	
+	/**
+	 * Stores the given group-id in the client state.
+	 * @param userId id of a user
+	 */
+	public void setUserGroupId(String groupId) {
+		this.groupId = groupId;
+	}
+	
 	
 	/**
 	 * Returns the user's preferred height for the output box.

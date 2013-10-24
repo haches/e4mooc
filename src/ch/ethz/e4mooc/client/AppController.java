@@ -147,6 +147,8 @@ public class AppController implements ValueChangeHandler<String> {
 					E4mooc.cState.setUserOutputBoxHeight(Integer.valueOf(queryParameters.get("outputht")));
 				if(queryParameters.containsKey("bgcolor"))
 					E4mooc.cState.setUserBackgroundColor(queryParameters.get("bgcolor"));
+				if(queryParameters.containsKey("groupid"))
+					E4mooc.cState.setUserGroupId(queryParameters.get("groupid"));
 			}
 		}
 		

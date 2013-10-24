@@ -11,5 +11,6 @@ _Query parameters_
 
 A URL of a particular project can have query parameters. Currently, the following parameters will be processed (and all other parameters are ignored):
 * ```id``` a string representing a user id
+* ```groupid``` a string representing the group of a user
 * ```outputht``` an integer value defining the height of the output box
 * ```bgcolor``` a hex-formated string that defines the background color
