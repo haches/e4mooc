@@ -20,11 +20,11 @@ public interface ExecutionServiceAsync {
 	/**
 	 * @see ch.ethz.se.client.ExecutionService#compile(String, String, String)
 	 */	
-	void compile(String projectName, Map<String, String> inputFiles, String timeStampOfLastCompilation, AsyncCallback<CompilationResultDTO> callback);
+	void compile(String projectName, Map<String, String> inputFiles, String timeStampOfLastCompilation, String userId, String groupId, AsyncCallback<CompilationResultDTO> callback);
 	
 	/**
 	 * @see ch.ethz.se.client.ExecutionService#execute(String)
 	 */	
-	void execute(String projectName, String timeStamp, AsyncCallback<String> callback);
+	void execute(String projectName, String timeStamp, String userId, String groupId, AsyncCallback<String> callback);
 
 }

@@ -22,9 +22,11 @@ public interface ExecutionService extends RemoteService {
 	 * @param projectName the name of the project to compile
 	 * @param map with file names and file contents (keys are file names, values are file content)
 	 * @param timeStampOfLastCompilation the time stamp of the last compilation (if one has been done before)
+	 * @param the id of the user (if unknown provide an empty string)
+	 * @param the id of the user's group (if unknown provide an empty string)
 	 * @return an object containing of the compilation
 	 */
-	public CompilationResultDTO compile(String projectName, Map<String, String> inputFiles, String timeStampOfLastCompilation);
+	public CompilationResultDTO compile(String projectName, Map<String, String> inputFiles, String timeStampOfLastCompilation, String userId, String groupId);
 	
 	/**
 	 * Executes the project with the given project name.
@@ -32,8 +34,10 @@ public interface ExecutionService extends RemoteService {
 	 * Otherwise, it will an error message string.
 	 * @param projectName the project name
 	 * @param timeStamp the time stamp when the project was last compiled on the server
+	 * @param the id of the user (if unknown, provide an empty string)
+	 * @param the id of the user's group (if unknown provide an empty string)
 	 * @return the output of the program or a default error message if it was not possible to run the program
 	 */
-	public String execute(String projectName, String timeStamp);
+	public String execute(String projectName, String timeStamp, String userId, String groupId);
 	
 }

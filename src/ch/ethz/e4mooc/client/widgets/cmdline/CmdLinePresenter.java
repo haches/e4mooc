@@ -71,9 +71,11 @@ public class CmdLinePresenter implements CmdLineView.CmdLinePresenter {
 		eventBus.fireEvent(new CompilationStartedEvent());
 		
 		String projectName = E4mooc.cState.getProjectName();
+		String userId = E4mooc.cState.getUserId();
+		String groupId = E4mooc.cState.getUserGroupId();
 		HashMap<String, String> inputFiles = E4mooc.cState.getContentOfAllFiles();
 		
-		E4mooc.execService.compile(projectName, inputFiles, timeStamp, new AsyncCallback<CompilationResultDTO>() { 
+		E4mooc.execService.compile(projectName, inputFiles, timeStamp, userId, groupId, new AsyncCallback<CompilationResultDTO>() { 
 			
 			@Override
 			public void onSuccess(CompilationResultDTO result) {
@@ -120,7 +122,9 @@ public class CmdLinePresenter implements CmdLineView.CmdLinePresenter {
 		
 
 		String projectName = E4mooc.cState.getProjectName();
-		E4mooc.execService.execute(projectName, timeStamp, new AsyncCallback<String>() {
+		String userId = E4mooc.cState.getUserId();
+		String groupId = E4mooc.cState.getUserGroupId();
+		E4mooc.execService.execute(projectName, timeStamp, userId, groupId, new AsyncCallback<String>() {
 
 			@Override
 			public void onSuccess(String result) {

@@ -21,6 +21,8 @@ import org.apache.commons.exec.environment.EnvironmentUtils;
 import org.apache.commons.io.FileUtils;
 
 import ch.ethz.e4mooc.client.ExecutionService;
+import ch.ethz.e4mooc.server.db.DAO;
+import ch.ethz.e4mooc.server.db.RequestType;
 import ch.ethz.e4mooc.server.util.ProjectModel;
 import ch.ethz.e4mooc.server.util.ServerProperties;
 import ch.ethz.e4mooc.server.util.ServerState;
@@ -45,13 +47,22 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
 	private final String e4moocTmp = ServerProperties.E4MOOC_TMP_FOLDER.toString();
 	private final String SEP = System.getProperty("file.separator");
 	
-	public CompilationResultDTO compile(String projectName, Map<String, String> inputFiles, String timeStampOfLastCompilation) {
+	/** stores the last code input that was send by the user running "compile" */
+	Map<String, String> codeMap;
+	
+	public CompilationResultDTO compile(String projectName, Map<String, String> inputFiles, String timeStampOfLastCompilation, String userId, String groupId) {
+		
+		// store the input
+		codeMap = inputFiles;
 		
 		// get the session id
 		String sessionId = this.getThreadLocalRequest().getSession().getId();
 		
 		
 		LOGGER.log(Level.INFO, "Got request to \"Compile\" Eiffel project: " + projectName + ". Session id: " + sessionId);
+		// log the compile request in the database
+		DAO.storeRequest(projectName, userId, groupId, sessionId, RequestType.COMPILE);
+		
 		
 		// first, we check if we got a valid time stamp from a previous compilation
 		// if yes AND the time stamp is not too old, we delete the previously generated tmp-compilation-folder
@@ -116,7 +127,7 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
 	}
 	
 	@Override
-	public String execute(String projectName, String timeStamp) {
+	public String execute(String projectName, String timeStamp, String userId, String groupId) {
 		
 		long killExecutionAfterMilliSeconds = 1000 * 30; // we want to time-out the execution of a program after 30 seconds
 		
@@ -129,7 +140,8 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
 		String ecfFileName = ServerState.getState().getEcfFileNameWithoutAnyPath(projectName);
 		
 		LOGGER.log(Level.INFO, "Got request to \"Run\" Eiffel project: " + projectName + ". Session id: " + sessionId);
-		
+		// log the execution request in the database
+		int requestId = DAO.storeRequest(projectName, userId, groupId, sessionId, RequestType.RUN);
 		
 		// first we check how long it's been since the program was compiled
 		Long timeOfLastCompilation = 0L;
@@ -268,7 +280,45 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
 		// the user called this compile method thus we can set/update the time stamp for this project
 		ServerState.getState().setTmpFolderAndTimeStamp(pathOfTmpFolderAndProject);
 		
+		
+		//before returning the result we check if the first line contains the special formatted line for test results
+		if(result.startsWith("<!--@test=")) {
+			String [] testResults = extractTestResults(result);
+			
+			// write the test summary to the DB
+			int summaryId = DAO.storeTestSummary(requestId, Integer.valueOf(testResults[0]), Integer.valueOf(testResults[1]), Integer.valueOf(testResults[2]));
+			// write the test details to the DB
+			DAO.storeTestDetails(summaryId, codeMap);
+			
+			// remove the test-result string from the result that's returned to the user
+			result = result.substring(result.indexOf("-->") + 3);
+		}
+		
+		
 		return result;
+	}
+	
+	
+	/**
+	 * Given a string that starts with information about test results,
+	 * this method extracts the test results. 
+	 * @param result the input string which is expected to start with something like "<!--@test=30;15;15-->..."
+	 * @return an array that contains the numbers (in the order of the input string, e.g. 32, 15, 15)
+	 */
+	protected String[] extractTestResults(String result) {
+		// note: the method is protected to it's JUnit class can see it through inheritance
+		
+		String [] testResults;
+		
+		int startIndex = 10; // calculated as "<!--@test=".length();
+		int endIndex = result.indexOf("-->");
+		String testResultString = result.substring(startIndex, endIndex);
+		// remove any kind of space
+		testResultString = testResultString.replace(" ", "");
+		// split on each semicolon
+		testResults = testResultString.split(";");
+		
+		return testResults;
 	}
 	
 	
