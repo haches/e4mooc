@@ -60,6 +60,7 @@ public class ClientState {
 		
 		// initialize default values for user properties
 		userId = "";
+		groupId = "";
 		outputBoxHeight = 250;
 		backgroundColor = "#FFFFFF"; // set it to white
 		
