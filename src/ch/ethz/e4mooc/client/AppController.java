@@ -151,8 +151,6 @@ public class AppController implements ValueChangeHandler<String> {
 					E4mooc.cState.setUserGroupId(queryParameters.get("groupid"));
 			}
 		}
-		
-		System.out.println("Project URI: " + result);
 		return result;
 	}
 	

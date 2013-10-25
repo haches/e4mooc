@@ -11,13 +11,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.exec.PumpStreamHandler;
-import org.apache.commons.exec.environment.EnvironmentUtils;
 import org.apache.commons.io.FileUtils;
 
 import ch.ethz.e4mooc.client.ExecutionService;
@@ -32,6 +30,8 @@ import ch.ethz.e4mooc.shared.CompilationResultDTO;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
+ * Server side implementation of the execution service.
+ * 
  * @author hce
  *
  */
