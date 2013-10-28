@@ -33,9 +33,9 @@ public class DAO {
 		String db = "e4mooc";
 		String driver = "com.mysql.jdbc.Driver";
 		// Mysql's user
-		String user = "root";
+		String user = DbPassword.dbUserName;
 		// Mysql's password
-		String pass = "minhngoc";
+		String pass = DbPassword.dbPassword;
 
 		try {
 			Class.forName(driver).newInstance();
