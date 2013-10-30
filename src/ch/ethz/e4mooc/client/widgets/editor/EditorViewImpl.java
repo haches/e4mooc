@@ -3,6 +3,7 @@
  */
 package ch.ethz.e4mooc.client.widgets.editor;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -113,6 +114,9 @@ public class EditorViewImpl extends Composite implements EditorView {
 		navTabs.clear();
 		// clear the list were we keep references to the navLinks
 		navLinks.clear();
+		
+		// sort the tabNames so they are in alphabetic order
+		Collections.sort(tabNames);
 		
 		for(String tabName: tabNames) {
 			// create the navLink object which represents a tab
