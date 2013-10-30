@@ -161,7 +161,7 @@ public class AppController implements ValueChangeHandler<String> {
 		for(String pair: pairs) {
 			int idx = pair.indexOf("=");
 			// have to decode the Url to get the original strings (e.g. space is %20 in Url formatting)
-			result.put(URL.decode(pair.substring(0, idx)), URL.decode(pair.substring(idx + 1)));
+			result.put(URL.decodeQueryString(pair.substring(0, idx)), URL.decodeQueryString(pair.substring(idx + 1)));
 		}
 		return result;
 	}
