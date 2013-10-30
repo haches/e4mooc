@@ -63,7 +63,7 @@ public class EditorViewImpl extends Composite implements EditorView {
 		navLinks = new LinkedList<NavLink>();
 		
 		reloadBtn.setIcon(IconType.REFRESH);
-		reloadBtn.setTitle("Click to reload the\noriginal version of the\ncurrent example. Your\nchanges will be lost.");
+		reloadBtn.setTitle("Click to reload the\noriginal version of the\ncurrent class. Your\nchanges will be lost.");
 		
 		// we need to set the id of the <div> element. Can't do that through the XML file.
 		aceContainer.setId(aceId);
