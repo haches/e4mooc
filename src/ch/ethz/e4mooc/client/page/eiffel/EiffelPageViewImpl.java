@@ -17,6 +17,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -60,6 +61,9 @@ public class EiffelPageViewImpl extends Composite implements EiffelPageView {
 	 */
 	public EiffelPageViewImpl() {
 		initWidget(uiBinder.createAndBindUi(this));
+		
+		// no bg image on the Eiffel page
+		RootPanel.getBodyElement().getStyle().setBackgroundImage(null);
 	}
 	
 	@Override
@@ -112,6 +116,7 @@ public class EiffelPageViewImpl extends Composite implements EiffelPageView {
 
 	@Override
 	public void setBackgroundColor(String color) {
-		mainPanel.getElement().getStyle().setBackgroundColor(color);
+		// we set the bg color directly in the <body> element
+		RootPanel.getBodyElement().getStyle().setBackgroundColor(color);
 	}
 }

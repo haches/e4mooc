@@ -17,6 +17,7 @@ import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.Hyperlink;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -56,6 +57,9 @@ public class RootPageViewImpl extends Composite implements RootPageView {
 	 */
 	public RootPageViewImpl() {
 		initWidget(uiBinder.createAndBindUi(this));
+		
+		// we set the bg picutre directly in the body element
+		RootPanel.getBodyElement().getStyle().setBackgroundImage("url(img/texturetastic_gray.png)");
 	}
 
 	@Override

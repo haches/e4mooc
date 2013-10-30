@@ -7,7 +7,6 @@
 		/* Add CSS here. See the GWT docs on UI Binder for more details */
 		
 		.panel {
-			min-height: 100%;
 			background-image: url('img/texturetastic_gray.png');
 		}
 		
