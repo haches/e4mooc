@@ -116,7 +116,7 @@ public class EditorViewImpl extends Composite implements EditorView {
 		navLinks.clear();
 		
 		// sort the tabNames so they are in alphabetic order
-		Collections.sort(tabNames);
+		//Collections.sort(tabNames);
 		
 		for(String tabName: tabNames) {
 			// create the navLink object which represents a tab
