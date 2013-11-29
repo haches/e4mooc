@@ -17,11 +17,7 @@ public interface ServerProperties {
 	
 	/** the path separtor used by the operating system */
 	public final String SEP = System.getProperty("file.separator");
-	
-	/** is true if the current system is windows */
-	@Deprecated
-	public static final boolean isWindows = System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
-	
+		
 	/** the folder were the tmp folders of compiled project should be stored */
 	public final String E4MOOC_TMP_FOLDER = System.getenv("E4MOOC_TMP");
 	
