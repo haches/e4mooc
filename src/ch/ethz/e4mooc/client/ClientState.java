@@ -3,7 +3,9 @@
  */
 package ch.ethz.e4mooc.client;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -11,6 +13,7 @@ import ch.ethz.e4mooc.shared.ProjectModelDTO;
 
 import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
+import com.google.gwt.storage.client.Storage;
 import com.google.gwt.user.client.Window;
 import com.google.web.bindery.event.shared.EventBus;
 
@@ -26,16 +29,14 @@ public class ClientState {
 	private String currentProjectName;
 	
 	/** the project model of the current project */
-	private ProjectModelDTO projectModel;
-	/** maps tab indexes to file names */
-	private Map<Integer, String> tabIndexToFileNameMap;
+//	private ProjectModelDTO projectModel;
+	/** a list of all the file names used by the project */
+	private List<String> projectFileNames;
 	/** the event bus used throughout the application */
-	private EventBus eventBus;
-	/** the text that is currently shown in the editor */
-	private String inputFile;
+	//private EventBus eventBus;
 	
-	/** a map that stores the content of files as they were modified by the user */
-	private Map<String, String> userStorage;
+	/** a map that stores files at a specific tab index */
+	private Map<Integer, FileContainer> userStorage;
 	
 	/**
 	 * the following fields are about storing Uri parameters
@@ -49,20 +50,26 @@ public class ClientState {
 	/** the color of the background */
 	private String backgroundColor;
 	
+	
+	Storage myStorage;
+	
+	
 	/**
 	 * 
 	 * @param eventBus the eventBus used throughout the application
 	 */
 	public ClientState(EventBus eventBus) {
-		this.eventBus = eventBus;
-		tabIndexToFileNameMap = new HashMap<Integer, String>();
-		userStorage = new HashMap<String, String>();
+		//this.eventBus = eventBus;
+		projectFileNames = new LinkedList<String>();
+		userStorage = new HashMap<Integer, FileContainer>();
 		
 		// initialize default values for user properties
 		userId = "";
 		groupId = "";
 		outputBoxHeight = 250;
 		backgroundColor = "#FFFFFF"; // set it to white
+		
+		myStorage = Storage.getLocalStorageIfSupported();
 		
 		bind();
 	}
@@ -87,19 +94,23 @@ public class ClientState {
 	 * @param pm the project model
 	 */
 	public void storeProjectModel(ProjectModelDTO pm) {
-		// store the project model
-		this.projectModel = pm;
+		
+		this.currentProjectName = pm.getProjectName();
 		
 		// clear out the user-storage (in case the new PM has a file with the same name)
 		userStorage.clear();
 		
-		// counter for the tab index
-		int counter = 0;
+		// sort the files by filename so we display them in alphabetical order
+		Collections.sort(pm.getFileNames());
 		
 		// map the files of the project to tab indexes
-		for(String fileName: pm.getFileNames()) {
-			tabIndexToFileNameMap.put(counter, fileName);
-			counter++;
+		
+		for(int i = 0; i < pm.getFileNames().size(); i++) {
+			String fileName = pm.getFileNames().get(i);
+			FileContainer c = new FileContainer(i, fileName, pm.getFileContent(fileName));
+			userStorage.put(i, c);
+			
+			projectFileNames.add(fileName);
 		}
 	}
 
@@ -108,7 +119,7 @@ public class ClientState {
 	 * @return the project name
 	 */
 	public String getProjectName() {
-		return projectModel.getProjectName();
+		return currentProjectName;
 	}
 	
 	/**
@@ -116,25 +127,7 @@ public class ClientState {
 	 * @return list of file names
 	 */
 	public List<String> getProjectFileNames() {
-		return projectModel.getFileNames();
-	}
-	
-
-	/**
-	 * Returns the content of a file based on the file name.
-	 * @param fileName the file name
-	 * @return the content of the file
-	 */
-	public String getContentOfFile(String fileName) {
-		
-		String result = "";
-	
-		if(userStorage.containsKey(fileName))
-			result = userStorage.get(fileName);
-		else
-			result = projectModel.getFileContent(fileName);
-		
-		return result;
+		return projectFileNames;
 	}
 	
 	
@@ -144,17 +137,12 @@ public class ClientState {
 	 * @return the content of the file that belongs to the tab index
 	 */
 	public String getContentOfFile(int tabIndex) {
-				
 		String result = "";
-		
-		String fileName = tabIndexToFileNameMap.get(tabIndex);
-		
-		if(userStorage.containsKey(fileName)) {
-			// get the version from the local storage
-			result = userStorage.get(fileName);
-		} else {
-			result = projectModel.getFileContent(fileName);
+				
+		if(userStorage.containsKey(tabIndex)) {
+			result = userStorage.get(tabIndex).getFileContent();
 		}
+		
 		return result;
 	}
 	
@@ -165,10 +153,10 @@ public class ClientState {
 	 */
 	public HashMap<String, String> getContentOfAllFiles() {
 		HashMap<String, String> result = new HashMap<String, String>();
-		
-		for(String fileName: this.getProjectFileNames()) {
-			result.put(fileName, this.getContentOfFile(fileName));
-		}
+				
+		for(int tabIndex: userStorage.keySet())
+			result.put(userStorage.get(tabIndex).getFileName(), userStorage.get(tabIndex).getFileContent());
+
 		return result;
 	}
 
@@ -179,8 +167,7 @@ public class ClientState {
 	 * @param text the text to store
 	 */
 	public void storeTextFromUser(int tabIndex, String text) {
-		String fileName = tabIndexToFileNameMap.get(tabIndex);
-		userStorage.put(fileName, text);
+		userStorage.get(tabIndex).setFileContent(text);
 	}
 
 	
@@ -189,10 +176,8 @@ public class ClientState {
 	 * @param tabIndex the tab index of the file for which to delete the entry
 	 */
 	public void deleteFromStorage(int tabIndex) {	
-		String fileName = tabIndexToFileNameMap.get(tabIndex);
-		
-		if(userStorage.containsKey(fileName))
-			userStorage.remove(fileName);	
+		if(userStorage.containsKey(tabIndex))
+			userStorage.get(tabIndex).revertFileContentToOriginal();
 	}
 	
 	
@@ -262,5 +247,126 @@ public class ClientState {
 	 */
 	public void setUserBackgroundColor(String backgroundColor) {
 		this.backgroundColor = backgroundColor;
+	}
+
+
+	public int[] getCursorPositionForFile(int tabIndex) {
+		
+		int [] result = new int[3];
+		
+		if (userStorage.containsKey(tabIndex))
+			result = userStorage.get(tabIndex).getCursorPosition();
+		
+		return result;
+	}
+
+
+	public void storeCursorPositionFromUser(int tabIndex, int[] currentCursorPosition) {
+		if (userStorage.containsKey(tabIndex))
+			userStorage.get(tabIndex).setCursorPosition(currentCursorPosition);
+	}
+	
+}
+
+
+class FileContainer {
+	
+	private String fileName;
+	/** the content of the file as returned by the server */
+	private final String originalFileContent;
+	/** the content of the file including changes made by the user */
+	private String userFileContent;
+	private int[] cursorPosition;
+	private int tabIndex;
+	/** must be set to true if this FileContainer holds content with user modifications */
+	private boolean hasUserContent;
+	
+	public FileContainer(int tabIndex, String fileName, String fileContent) {
+		this.tabIndex = tabIndex;
+		this.fileName = fileName;
+		this.originalFileContent = fileContent;
+		this.hasUserContent = false;
+		
+		// Initialize the cursorPosition array with 0
+		this.cursorPosition = new int[3];
+	}
+	
+	
+	/**
+	 * Call this method to revert the file's content to the original
+	 * version that has been provided by when the FileContainer object was created.
+	 */
+	public void revertFileContentToOriginal() {
+		this.userFileContent = "";
+		this.hasUserContent = false;
+		this.cursorPosition = new int[3];
+	}
+	
+	
+	/**
+	 * @return the fileName
+	 */
+	public String getFileName() {
+		return fileName;
+	}
+
+
+	/**
+	 * @param fileName the fileName to set
+	 */
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+	
+	/**
+	 * Return the content that belongs to the file.
+	 * The method returns the content of the file that includes the changes of a user if such changes exist;
+	 * Otherwise the content is the one the one that was provided when the FileContainer was created.
+	 * @return the content of the file represented by the FileContainer
+	 */
+	public String getFileContent() {
+		if (hasUserContent)
+			return userFileContent;
+		else
+			return originalFileContent;
+	}
+	
+	
+	public void setFileContent(String content) {
+		this.userFileContent = content;
+		this.hasUserContent = true;
+	}
+
+
+	/**
+	 * @return the cursorPosition
+	 */
+	public int[] getCursorPosition() {
+		return cursorPosition;
+	}
+
+
+	/**
+	 * @param cursorPosition the cursorPosition to set
+	 */
+	public void setCursorPosition(int[] cursorPosition) {
+		this.cursorPosition = cursorPosition;
+	}
+
+
+	/**
+	 * @return the tabIndex
+	 */
+	public int getTabIndex() {
+		return tabIndex;
+	}
+
+
+	/**
+	 * @param tabIndex the tabIndex to set
+	 */
+	public void setTabIndex(int tabIndex) {
+		this.tabIndex = tabIndex;
 	}
 }

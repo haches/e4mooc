@@ -6,6 +6,7 @@ package ch.ethz.e4mooc.shared;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A ProjectModel represents an 
@@ -71,7 +72,7 @@ public class ProjectModelDTO implements Serializable {
 	 * the current object.
 	 * @return all the file names in the project
 	 */
-	public LinkedList<String> getFileNames() {
+	public List<String> getFileNames() {
 		return fileNames;
 	}
 	

@@ -53,6 +53,8 @@ public class EditorPresenter implements EditorView.EditorPresenter {
 				String fileContent = E4mooc.cState.getContentOfFile(event.getTabIndex());
 				view.setEditorText(fileContent);
 				view.updateSelectedTab(event.getTabIndex());
+				view.setCurrentCursorPosition(E4mooc.cState.getCursorPositionForFile(event.getTabIndex()));
+				view.updateSelectedTab(event.getTabIndex());
 				
 			}
 		});
@@ -101,12 +103,15 @@ public class EditorPresenter implements EditorView.EditorPresenter {
 		
 		// first we store the current user changes
 		E4mooc.cState.storeTextFromUser(view.getCurrentlySelectedTabIndex(), view.getEditorText());
-
+		E4mooc.cState.storeCursorPositionFromUser(view.getCurrentlySelectedTabIndex(), view.getCurrentCursorPosition());
+		
+		eventBus.fireEvent(new TabSelectedEvent(tabIndex));
 		
 		// get the example for the selected tab and load it into the browser
-		String fileContent = E4mooc.cState.getContentOfFile(tabIndex);
-		view.setEditorText(fileContent);
-		view.updateSelectedTab(tabIndex);
+//		String fileContent = E4mooc.cState.getContentOfFile(tabIndex);
+//		view.setEditorText(fileContent);
+//		view.setCurrentCursorPosition(E4mooc.cState.getCursorPositionForFile(tabIndex));
+//		view.updateSelectedTab(tabIndex);
 	}
 	
 	

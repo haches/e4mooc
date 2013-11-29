@@ -53,6 +53,10 @@ public class EditorViewImpl extends Composite implements EditorView {
 	private final String aceId = "_aceEditor";	
 	/** the index of the currently selected tab */
 	private int currentlySelectedTabIndex;
+	/** array to store the cursor position, at index 0 is the row value, at index 1 the column value */
+	private int cursorRow;
+	private int cursorColumn;
+	private int firstVisibleRow;
 			
 	/**
 	 * Constructor
@@ -163,4 +167,39 @@ public class EditorViewImpl extends Composite implements EditorView {
 		this.presenter = presenter;
 		
 	}
+
+	@Override
+	public int[] getCurrentCursorPosition() {
+		
+		int[] cursorPosition = new int[3];
+		
+		getCursorPosition();
+		cursorPosition[0] = cursorRow;
+		cursorPosition[1] = cursorColumn;
+		cursorPosition[2] = firstVisibleRow;
+		
+		return cursorPosition;
+	}
+	
+	
+	private native void getCursorPosition() /*-{
+		var editor = this.@ch.ethz.e4mooc.client.widgets.editor.EditorViewImpl::aceEditor;
+		this.@ch.ethz.e4mooc.client.widgets.editor.EditorViewImpl::cursorRow = editor.getCursorPosition().row;
+		this.@ch.ethz.e4mooc.client.widgets.editor.EditorViewImpl::cursorColumn = editor.getCursorPosition().column;
+		this.@ch.ethz.e4mooc.client.widgets.editor.EditorViewImpl::firstVisibleRow = editor.getFirstVisibleRow();
+	}-*/;
+
+	
+	@Override
+	public void setCurrentCursorPosition(int[] position) {
+		setCursorPosition(position[0], position[1], position[2]);
+	}
+	
+	
+	public native void setCursorPosition(int row, int column, int firstVisibleRow) /*-{
+		var editor = this.@ch.ethz.e4mooc.client.widgets.editor.EditorViewImpl::aceEditor;
+		editor.moveCursorTo(row, column);
+		editor.scrollToLine(firstVisibleRow);
+	}-*/;
+	
 }

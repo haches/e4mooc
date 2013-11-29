@@ -4,7 +4,7 @@
 package ch.ethz.e4mooc.server.util;
 
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -86,7 +86,7 @@ public class ProjectModel {
 	 * the current object.
 	 * @return all the file names in the project
 	 */
-	public LinkedList<String> getFileNames() {
+	public List<String> getFileNames() {
 		return projectModelDTO.getFileNames();
 	}
 	

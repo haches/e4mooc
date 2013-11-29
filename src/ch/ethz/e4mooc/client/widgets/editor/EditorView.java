@@ -95,5 +95,25 @@ public interface EditorView extends IView<EditorPresenter> {
 	 * @return index of the currently selected tab
 	 */
 	public int getCurrentlySelectedTabIndex();
-		
+	
+	
+	/**
+	 * Returns an array with 3 elements.
+	 * At index 0: the row the cursor.
+	 * At index 1: the column of the cursor.
+	 * At index 2: the first visible row of the editor.
+	 * @return array with 3 elements
+	 */
+	public int[] getCurrentCursorPosition();
+
+	/**
+	 * Sets the position of the cursor and the first visible line.
+	 * For the array the following convention is used:
+	 * At index 0: the row the cursor.
+	 * At index 1: the column of the cursor.
+	 * At index 2: the first visible row of the editor.
+	 */
+	public void setCurrentCursorPosition(int[] position);
+	
 }
+
