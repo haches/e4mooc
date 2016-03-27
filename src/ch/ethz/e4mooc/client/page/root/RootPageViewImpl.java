@@ -117,7 +117,7 @@ public class RootPageViewImpl extends Composite implements RootPageView {
 						TextArea code = new TextArea();
 						code.setWidth("273px");
 						code.setHeight("100px");
-						code.setText("<iframe width=\"800\" height=\"1000\"\nsrc=\"http://bmse-sandbox.inf.ethz.ch:8080/e4mooc/#" + projectName + "\" frameborder=\"0\"></iframe>");
+						code.setText("<iframe width=\"800\" height=\"1000\"\nsrc=\"http://comcom.csail.mit.edu/s4pubs/#" + projectName + "\" frameborder=\"0\"></iframe>");
 						vPanel.add(code);
 					}
 					
