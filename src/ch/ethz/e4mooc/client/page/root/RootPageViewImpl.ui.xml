@@ -12,7 +12,7 @@
 		
 		.header {
 			height: 110px;
-			background-color: #2d2d2d;
+			background-color: #5BC0DE;
 			border-color: #000;
 			border-width: 2px;
 			border-bottom-left-radius: 10px;
@@ -100,8 +100,8 @@
 	<g:HTMLPanel ui:field="mainPanel" addStyleNames="{style.panel}">
 		<div class="{style.header}">
 			<h1 class="{style.title}">
-				<img src="img/asd-th.png"/>
-				Eiffel 4 MOOC	
+				<img src="img/synquid-logo.png"/>
+				Synquid Examples	
 			</h1>
 		</div>
 		<div class="{style.content}">
