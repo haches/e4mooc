@@ -115,7 +115,7 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
 		
 		// append the .sq file with full path (if it exists)
 		if(!(ServerState.getState().getProjectModel(projectName).getFileNames().isEmpty())) {
-			cmdInstruction.addArgument(pathOfTmpFolder + SEP + ServerState.getState().getProjectModel(projectName).getFileNames().get(0));
+			cmdInstruction.addArgument(pathOfTmpFolder + SEP + projectName + SEP + ServerState.getState().getProjectModel(projectName).getFileNames().get(0));
 		}
 		
 		resultMsg = execute(cmdInstruction, 1000 * 180); // should timeout after 3 minute(s)
@@ -141,7 +141,7 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
 		// get the name of the ecf file
 		String ecfFileName = ServerState.getState().getEcfFileNameWithoutAnyPath(projectName);
 		
-		LOGGER.log(Level.INFO, "Got request to \"Run\" Eiffel project: " + projectName + ". Session id: " + sessionId);
+		LOGGER.log(Level.INFO, "Got request to \"Run\" Synquid project: " + projectName + ". Session id: " + sessionId);
 		
 		
 		// first we check how long it's been since the program was compiled
