@@ -4,6 +4,7 @@
 package ch.ethz.e4mooc.client.widgets.cmdline;
 
 import com.github.gwtbootstrap.client.ui.Button;
+import com.github.gwtbootstrap.client.ui.TextBox;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -41,10 +42,10 @@ public class CmdLineViewImpl extends Composite implements CmdLineView {
 
 	@UiField
 	Button compileButton;
-	@UiField
-	Button runButton;
-	//@UiField
-	//TextBox argumentBox;
+//	@UiField
+//	Button runButton;
+//	@UiField
+//	TextBox argumentBox;
 	//@UiField
 	//SpanElement argDescription;
 	
@@ -56,10 +57,10 @@ public class CmdLineViewImpl extends Composite implements CmdLineView {
 		presenter.onCompileBtnClick();
 	}
 	
-	@UiHandler("runButton")
-	void onRunBtnClick(ClickEvent e) {
-		presenter.onRunBtnClick();
-	}
+//	@UiHandler("runButton")
+//	void onRunBtnClick(ClickEvent e) {
+//		presenter.onRunBtnClick();
+//	}
 	
 //	/**
 //	 * Pressing enter on the argument-box will run the tool.
@@ -85,18 +86,18 @@ public class CmdLineViewImpl extends Composite implements CmdLineView {
 
 	@Override
 	public void setRunButtonEnabled(boolean enabled, String disabledText) {
-		runButton.setEnabled(enabled);
-		if(enabled)
-			runButton.setText("Run...");
-		else
-			runButton.setText(disabledText);
+//		runButton.setEnabled(enabled);
+//		if(enabled)
+//			runButton.setText("Run...");
+//		else
+//			runButton.setText(disabledText);
 	}
 	
 	@Override
 	public void setCompileBtnEnabled(boolean enabled, String disabledText) {
 		compileButton.setEnabled(enabled);
 		if(enabled)
-			compileButton.setText("Compile");
+			compileButton.setText("Run...");
 		else
 			compileButton.setText(disabledText);
 	}
@@ -105,7 +106,7 @@ public class CmdLineViewImpl extends Composite implements CmdLineView {
 //	public String getArgument() {
 //		return argumentBox.getText();
 //	}
-
+//
 //	@Override
 //	public void setArgument(String arg) {
 //		argumentBox.setText(arg);

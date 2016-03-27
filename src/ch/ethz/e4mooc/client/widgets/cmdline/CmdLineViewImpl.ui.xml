@@ -5,8 +5,8 @@
 	<ui:style>
 		/* Add CSS here. See the GWT docs on UI Binder for more details */
 		.button {
-			/* font-weight: bold; */
-			/* width: 5em; */
+			font-weight: bold;
+			width: 4em;
 		}
 		
 		.argTextBox {
@@ -26,9 +26,9 @@
 	</ui:style>
 	
 	<g:HTMLPanel addStyleNames="{style.cmdLine}">
-		<b:Button ui:field="compileButton" addStyleNames="{style.button}" icon="COG"> Compile</b:Button>
-		<b:Button ui:field="runButton" addStyleNames="{style.button}" icon="PLAY">Run...</b:Button>
-		<!-- <b:TextBox placeholder="Arguments" ui:field="argumentBox" addStyleNames="{style.argTextBox}"/> -->
-		<!-- <span ui:field="argDescription" class="{style.argDescription}">Hint: Here comes text with commandline argument description.</span> -->
+		<b:Button ui:field="compileButton" addStyleNames="{style.button}">Run...</b:Button>
+		<!--<b:Button ui:field="runButton" addStyleNames="{style.button}" icon="PLAY">Run...</b:Button>-->
+		<!--<b:TextBox placeholder="Arguments" ui:field="argumentBox" addStyleNames="{style.argTextBox}"/>-->
+		<!--<span ui:field="argDescription" class="{style.argDescription}">Hint: Here comes text with commandline argument description.</span> -->
 	</g:HTMLPanel>
 </ui:UiBinder> 
