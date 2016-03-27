@@ -127,8 +127,8 @@ public class EiffelPagePresenter implements EiffelPageView.Presenter {
 	 * @param pm the project model
 	 */
 	private void applyProjectModel(ProjectModelDTO pm) {
-		// set the editor mode to eiffel
-		editorPresenter.setEditorMode("eiffel");
+		// set the editor mode to synquid
+		editorPresenter.setEditorMode("synquid");
 	
 		// add the files
 		editorPresenter.addFiles(pm.getFileNames());
