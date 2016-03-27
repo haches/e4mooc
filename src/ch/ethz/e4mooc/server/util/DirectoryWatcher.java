@@ -261,7 +261,7 @@ public class DirectoryWatcher extends Thread {
 				}
 				
 				// get all the Eiffel files (i.e. the files ending with ".e")
-				Collection<File> eiffelFiles = FileUtils.listFiles(f, new String[] {"e"}, true);
+				Collection<File> eiffelFiles = FileUtils.listFiles(f, new String[] {"sq"}, true);
 				for(File ef: eiffelFiles) {
 					
 					// check that the current file is not on the black list
