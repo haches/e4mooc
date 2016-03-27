@@ -19,10 +19,13 @@ public interface ServerProperties {
 	public final String SEP = System.getProperty("file.separator");
 		
 	/** the folder were the tmp folders of compiled project should be stored */
-	public final String E4MOOC_TMP_FOLDER = System.getenv("E4MOOC_TMP");
+	public final String E4MOOC_TMP_FOLDER = System.getenv("S4PUBS_TMP");
 	
 	/** the folder were the Eiffel projects are stored */
-	public final String E4MOOC_PROJECTS_FOLDER = System.getenv("E4MOOC");
+	public final String E4MOOC_PROJECTS_FOLDER = System.getenv("S4PUBS");
+	
+	/** full qualified location of the pyton script file that's called to execute Synquid */
+	public final String S4PUBS_EXEC_FILE = System.getenv("S4PUBS_EXEC_FILE");
 	
 	/** the path to the Sandboxie application (a simple sandbox for windows) */
 	public final String SANDBOXIE_START = "C:\\Program Files\\Sandboxie\\Start.exe";

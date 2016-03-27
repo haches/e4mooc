@@ -19,8 +19,6 @@ import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.io.FileUtils;
 
 import ch.ethz.e4mooc.client.ExecutionService;
-import ch.ethz.e4mooc.server.db.DAO;
-import ch.ethz.e4mooc.server.db.RequestType;
 import ch.ethz.e4mooc.server.util.ProjectModel;
 import ch.ethz.e4mooc.server.util.ServerProperties;
 import ch.ethz.e4mooc.server.util.ServerState;
@@ -45,6 +43,7 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
 	
 	private final String e4mooc = ServerProperties.E4MOOC_PROJECTS_FOLDER.toString();
 	private final String e4moocTmp = ServerProperties.E4MOOC_TMP_FOLDER.toString();
+	private final String s4pubsExecFile = ServerProperties.S4PUBS_EXEC_FILE.toString();
 	private final String SEP = System.getProperty("file.separator");
 	
 	/** stores the last code input that was send by the user running "compile" */
@@ -60,8 +59,6 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
 		
 		
 		LOGGER.log(Level.INFO, "Got request to \"Compile\" Eiffel project: " + projectName + ". Session id: " + sessionId);
-		// log the compile request in the database
-		DAO.storeRequest(projectName, userId, groupId, sessionId, RequestType.COMPILE);
 		
 		
 		// first, we check if we got a valid time stamp from a previous compilation
@@ -85,7 +82,7 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
 		
 		
 		CommandLine cmdInstruction = null;
-		String resultMsg = "Unable to compile the program. Please report this via email to marco.piccioni{at}inf.ethz.ch";
+		String resultMsg = "Unable to generate your program. Please report this via email to polikarn[at]csail.mit.edu";
 				
 		String timeStamp = String.valueOf(System.currentTimeMillis());
 		// the path to the temporary folder
@@ -98,31 +95,36 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
 			copyProjectToFolder(pathOfTmpFolder, projectName, inputFiles);
 		} catch (Exception e) {
 			// the user get's a back an error message. Where exactly the error occurred is already logged to console by the method causing the error.
-			String msg = "An error occured while preparing the compilation on the server. Please try again.\nIf the error reoccurrs report this via email to marco.piccioni{at}inf.ethz.ch";
+			String msg = "An error occured while preparing Synquid on the server. Please try again.\nIf the error reoccurrs report this via email to polikarn[at]csail.mit.edu";
 			return new CompilationResultDTO(msg, timeStamp, false); 
 		}
 		
-		// create the command line instruction: ec -config projectName.ecf -stop -c_compile
-		cmdInstruction = getCommandLine("ec");
-		cmdInstruction.addArgument("-config");
-		cmdInstruction.addArgument(pathOfTmpFolder + SEP + ServerState.getState().getProjectModel(projectName).getEcfFile());
-		cmdInstruction.addArgument("-stop");
-		cmdInstruction.addArgument("-c_compile");
-		//cmdInstruction.addArgument("-freeze");	// we need freezing because only with C compilation can we redirect a programs output into a file
-		cmdInstruction.addArgument("-project_path");
-		cmdInstruction.addArgument(pathOfTmpFolderAndProject);
+//		// create the command line instruction: ec -config projectName.ecf -stop -c_compile
+//		cmdInstruction = getCommandLine("ec");
+//		cmdInstruction.addArgument("-config");
+//		cmdInstruction.addArgument(pathOfTmpFolder + SEP + ServerState.getState().getProjectModel(projectName).getEcfFile());
+//		cmdInstruction.addArgument("-stop");
+//		cmdInstruction.addArgument("-c_compile");
+//		//cmdInstruction.addArgument("-freeze");	// we need freezing because only with C compilation can we redirect a programs output into a file
+//		cmdInstruction.addArgument("-project_path");
+//		cmdInstruction.addArgument(pathOfTmpFolderAndProject);
 		
-		resultMsg = execute(cmdInstruction, 1000 * 180); // should timeout after 3 minutes
+		// create the command line instruction: ec -config projectName.ecf -stop -c_compile
+		cmdInstruction = getCommandLine("python");
+		cmdInstruction.addArgument(s4pubsExecFile);
+		
+		// append the .sq file with full path (if it exists)
+		if(!(ServerState.getState().getProjectModel(projectName).getFileNames().isEmpty())) {
+			cmdInstruction.addArgument(pathOfTmpFolder + SEP + ServerState.getState().getProjectModel(projectName).getFileNames().get(0));
+		}
+		
+		resultMsg = execute(cmdInstruction, 1000 * 180); // should timeout after 3 minute(s)
 		
 		// the user called this compile method thus we can set/update the time stamp for this project
 		ServerState.getState().setTmpFolderAndTimeStamp(pathOfTmpFolderAndProject);
 	
-		CompilationResultDTO result;
-		if(resultMsg.endsWith("completed" + System.lineSeparator()))
-			result = new CompilationResultDTO(resultMsg, timeStamp, true);
-		else
-			result = new CompilationResultDTO(resultMsg, timeStamp, false);
-		
+		CompilationResultDTO result = new CompilationResultDTO(resultMsg, timeStamp, true);
+	
 		return result;
 	}
 	
@@ -140,8 +142,7 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
 		String ecfFileName = ServerState.getState().getEcfFileNameWithoutAnyPath(projectName);
 		
 		LOGGER.log(Level.INFO, "Got request to \"Run\" Eiffel project: " + projectName + ". Session id: " + sessionId);
-		// log the execution request in the database
-		int requestId = DAO.storeRequest(projectName, userId, groupId, sessionId, RequestType.RUN);
+		
 		
 		// first we check how long it's been since the program was compiled
 		Long timeOfLastCompilation = 0L;
@@ -280,19 +281,20 @@ public class ExecutionServiceImpl extends RemoteServiceServlet implements Execut
 		// the user called this compile method thus we can set/update the time stamp for this project
 		ServerState.getState().setTmpFolderAndTimeStamp(pathOfTmpFolderAndProject);
 		
-		
-		//before returning the result we check if the first line contains the special formatted line for test results
-		if(result.startsWith("<!--@test=")) {
-			String [] testResults = extractTestResults(result);
-			
-			// write the test summary to the DB
-			int summaryId = DAO.storeTestSummary(requestId, Integer.valueOf(testResults[0]), Integer.valueOf(testResults[1]), Integer.valueOf(testResults[2]));
-			// write the test details to the DB
-			DAO.storeTestDetails(summaryId, codeMap);
-			
-			// remove the test-result string from the result that's returned to the user
-			result = result.substring(result.indexOf("-->") + 3);
-		}
+		// TODO: should remove this; not used by synquid
+//		//before returning the result we check if the first line contains the special formatted line for test results
+//		if(result.startsWith("<!--@test=")) {
+//			String [] testResults = extractTestResults(result);
+//			
+//			// write the test summary to the DB
+//			int summaryId = DAO.storeTestSummary(requestId, Integer.valueOf(testResults[0]), Integer.valueOf(testResults[1]), Integer.valueOf(testResults[2]));
+//			
+//			// write the test details to the DB
+//			//DAO.storeTestDetails(summaryId, codeMap);
+//			
+//			// remove the test-result string from the result that's returned to the user
+//			result = result.substring(result.indexOf("-->") + 3);
+//		}
 		
 		
 		return result;
